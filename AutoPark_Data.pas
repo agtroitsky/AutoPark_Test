@@ -88,12 +88,12 @@ function TdmAutoPark.GetData: boolean;
 var
   i: integer;
 begin
-  SetLength(PathLists,2);
+  SetLength(PathLists,10);
   SetLength(Drivers,2);
   SetLength(Dispatchers,2);
   SetLength(CarModels,2);
   SetLength(Cars,2);
-  SetLength(ListOrder,2);
+  SetLength(ListOrder,Length(PathLists));
 
   for i:=0 to High(ListOrder) do ListOrder[i]:=i;
 
@@ -155,8 +155,8 @@ begin
   end;
 
   with PathLists[0] do begin
-    tTimeIn:=EncodeDateTime(2023,2,15,6,11,0,0);
-    tTimeOut:=EncodeDateTime(2023,2,16,13,45,0,0);
+    tTimeIn:=EncodeDateTime(2023,2,10,6,11,0,0);
+    tTimeOut:=EncodeDateTime(2023,2,10,13,45,0,0);
     iDriverID:=0;
     iCarID:=0;
     iDispID:=0;
@@ -174,6 +174,41 @@ begin
     dPath:=400.9;
     bDeleted:=false;
   end;
+  with PathLists[2] do begin
+    tTimeIn:=EncodeDateTime(2023,2,15,9,15,0,0);
+    tTimeOut:=EncodeDateTime(2023,2,15,19,28,0,0);
+    iDriverID:=0;
+    iCarID:=0;
+    iDispID:=0;
+    dFuel:=56.3;
+    dPath:=650.9;
+    bDeleted:=false;
+  end;
+  with PathLists[3] do begin
+    tTimeIn:=EncodeDateTime(2023,2,16,9,15,0,0);
+    tTimeOut:=EncodeDateTime(2023,2,16,19,28,0,0);
+    iDriverID:=1;
+    iCarID:=1;
+    iDispID:=1;
+    dFuel:=21.3;
+    dPath:=280.9;
+    bDeleted:=false;
+  end;
+  with PathLists[4] do begin
+    tTimeIn:=EncodeDateTime(2023,2,17,9,15,0,0);
+    tTimeOut:=EncodeDateTime(2023,2,17,19,28,0,0);
+    iDriverID:=0;
+    iCarID:=0;
+    iDispID:=0;
+    dFuel:=38.3;
+    dPath:=350.9;
+    bDeleted:=false;
+  end;
+  PathLists[5]:=PathLists[0];
+  PathLists[6]:=PathLists[1];
+  PathLists[7]:=PathLists[2];
+  PathLists[8]:=PathLists[3];
+  PathLists[9]:=PathLists[4];
   result:=true;
 end;
 

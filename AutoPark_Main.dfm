@@ -23,9 +23,17 @@ object frmAutoParkMain: TfrmAutoParkMain
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitLeft = 96
-    ExplicitTop = 32
-    ExplicitWidth = 185
+    object cbShowDelete: TCheckBox
+      Left = 8
+      Top = 12
+      Width = 153
+      Height = 17
+      Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1091#1076#1072#1083#1077#1085#1085#1099#1077
+      Checked = True
+      State = cbChecked
+      TabOrder = 0
+      OnClick = cbShowDeleteClick
+    end
   end
   object sgPathLists: TStringGrid
     Left = 0
@@ -36,9 +44,9 @@ object frmAutoParkMain: TfrmAutoParkMain
     DefaultDrawing = False
     DrawingStyle = gdsGradient
     FixedCols = 0
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSelect]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSelect]
+    ScrollBars = ssVertical
     TabOrder = 1
     OnDrawCell = sgPathListsDrawCell
-    ExplicitTop = 47
   end
 end
