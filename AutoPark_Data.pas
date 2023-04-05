@@ -6,16 +6,6 @@ uses
   System.SysUtils, System.Classes, Data.DB, Data.Win.ADODB;
 
 type
-  TdmAutoPark = class(TDataModule)
-    ADOConnection1: TADOConnection;
-    ADOQuery1: TADOQuery;
-  private
-    { Private declarations }
-  public
-    { Public declarations }
-    function GetData: boolean;
-  end;
-
   TPathListRec = record
     tTimeOut,tTimeIn: TDateTime;
     iDriverID, iCarID, iDispID: integer;
@@ -47,6 +37,17 @@ type
     bDeleted: boolean;
   end;
 
+  TdmAutoPark = class(TDataModule)
+    ADOConnection: TADOConnection;
+    ADOQuery: TADOQuery;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    function GetData: boolean;
+    function AddPathList(aData: TPathListRec): boolean;
+  end;
+
 function GetDriverShortName(aID: integer): string;
 function GetDispShortName(aID: integer): string;
 
@@ -66,7 +67,7 @@ implementation
 {$R *.dfm}
 
 uses
-  System.DateUtils;
+  System.DateUtils, Dialogs;
 
 function GetDriverShortName(aID: integer): string;
 begin
@@ -94,9 +95,7 @@ begin
   SetLength(CarModels,2);
   SetLength(Cars,2);
   SetLength(ListOrder,Length(PathLists));
-
   for i:=0 to High(ListOrder) do ListOrder[i]:=i;
-
 
   with Drivers[0] do begin
     sSurName:='Кормухин';
@@ -210,6 +209,63 @@ begin
   PathLists[8]:=PathLists[3];
   PathLists[9]:=PathLists[4];
   result:=true;
+end;
+
+function TdmAutoPark.AddPathList(aData: TPathListRec): boolean;
+var
+  i: integer;
+  s: string;
+begin
+  result:=false;
+  with aData do begin
+    if (tTimeOut > 0) and (tTimeOut < Now) then begin
+      MessageDlg('Нельзя оформить путевку в прошлое',mtError,[mbOk],0);
+      exit;
+    end;
+    if (tTimeIn > 0) and ((tTimeIn-tTimeOut) < 1/24/6) then begin
+      MessageDlg('Поездка не может быть короче 10 минут',mtError,[mbOk],0);
+      exit;
+    end;
+    if (iDriverID < 0) or (iDriverId > High(Drivers)) then begin
+      MessageDlg('Неправильно указан водитель',mtError,[mbOk],0);
+      exit;
+    end;
+    if Drivers[iDriverID].bDeleted then begin
+      MessageDlg('Указан удаленный водитель',mtError,[mbOk],0);
+      exit;
+    end;
+    if (iCarID < 0) or (iCarID > High(Cars)) then begin
+      MessageDlg('Неправильно указан автомобиль',mtError,[mbOk],0);
+      exit;
+    end;
+    if Cars[iCarID].bDeleted then begin
+      MessageDlg('Указан удаленный автомобиль',mtError,[mbOk],0);
+      exit;
+    end;
+    if (iDispID < 0) or (iDispID > High(Dispatchers)) then begin
+      MessageDlg('Неправильно указан диспетчер',mtError,[mbOk],0);
+      exit;
+    end;
+    if Dispatchers[iDispID].bDeleted then begin
+      MessageDlg('Указан удаленный диспетчер',mtError,[mbOk],0);
+      exit;
+    end;
+    if dFuel < 0 then begin
+      MessageDlg('Указан отрицательный расход топлива',mtError,[mbOk],0);
+      exit;
+    end;
+    if dPath < 0 then begin
+      MessageDlg('Указан отрицательный пробег',mtError,[mbOk],0);
+      exit;
+    end;
+  end;
+  with ADOQuery do begin
+    SQL.Clear;
+    s:='INSERT pathlists(
+    SQL.Add(s);
+    i:=ExecSQL;
+  end;
+
 end;
 
 end.

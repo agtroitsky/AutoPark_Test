@@ -1,9 +1,11 @@
 object frmAutoParkMain: TfrmAutoParkMain
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
   Caption = #1055#1091#1090#1077#1074#1099#1077' '#1083#1080#1089#1090#1099
-  ClientHeight = 337
-  ClientWidth = 893
+  ClientHeight = 347
+  ClientWidth = 903
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,10 +21,11 @@ object frmAutoParkMain: TfrmAutoParkMain
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 893
+    Width = 903
     Height = 41
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 893
     object cbShowDelete: TCheckBox
       Left = 8
       Top = 12
@@ -38,8 +41,8 @@ object frmAutoParkMain: TfrmAutoParkMain
   object sgPathLists: TStringGrid
     Left = 0
     Top = 41
-    Width = 893
-    Height = 296
+    Width = 903
+    Height = 306
     Align = alClient
     DefaultDrawing = False
     DrawingStyle = gdsGradient
@@ -48,5 +51,7 @@ object frmAutoParkMain: TfrmAutoParkMain
     ScrollBars = ssVertical
     TabOrder = 1
     OnDrawCell = sgPathListsDrawCell
+    ExplicitWidth = 893
+    ExplicitHeight = 296
   end
 end
