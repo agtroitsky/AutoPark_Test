@@ -4,18 +4,20 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.ExtCtrls, Vcl.StdCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.ExtCtrls, Vcl.StdCtrls, System.UITypes;
 
 type
   TfrmAutoParkMain = class(TForm)
     Panel1: TPanel;
     sgPathLists: TStringGrid;
     cbShowDelete: TCheckBox;
+    Button1: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure sgPathListsDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
     procedure cbShowDeleteClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
     procedure GridUpdate;
@@ -32,7 +34,7 @@ implementation
 
 {$R *.dfm}
 
-uses AutoPark_Data;
+uses AutoPark_Data, PathList;
 
 var
   lflag: boolean = true;
@@ -47,12 +49,12 @@ begin
     with sgPathLists do with PathLists[k] do begin
       Cells[0,i]:=IntToStr(k+1);
       Cells[1,i]:=Cars[iCarID].sNumber;
-      Cells[2,i]:=GetDriverShortName(iDriverID);
+      Cells[2,i]:=GetDriverName(iDriverID);
       Cells[3,i]:=FormatDateTime('hh:nn dd.mm.yyyy',tTimeIn);
       Cells[4,i]:=FormatDateTime('hh:nn dd.mm.yyyy',tTimeOut);
       Cells[5,i]:=format('%.1f',[dPath]);
       Cells[6,i]:=format('%.1f',[dFuel]);
-      Cells[7,i]:=GetDispShortName(iDriverID);
+      Cells[7,i]:=GetDispName(iDriverID);
     end;
   end;
 end;
@@ -73,6 +75,11 @@ var
 begin
   if cbShowDelete.Checked then exit;
   for i:=High(ListOrder) downto 0 do if PathLists[ListOrder[i]].bDeleted then Delete(ListOrder,i,1);
+end;
+
+procedure TfrmAutoParkMain.Button1Click(Sender: TObject);
+begin
+  if not frmPathList.DoList(-1) then exit;
 end;
 
 procedure TfrmAutoParkMain.cbShowDeleteClick(Sender: TObject);

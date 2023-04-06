@@ -48,8 +48,9 @@ type
     function AddPathList(aData: TPathListRec): boolean;
   end;
 
-function GetDriverShortName(aID: integer): string;
-function GetDispShortName(aID: integer): string;
+function GetDriverName(aID: integer; aShort: boolean = true): string;
+function GetDispName(aID: integer; aShort: boolean = true): string;
+function GetCarName(aID: integer; aShort: boolean = true): string;
 
 var
   dmAutoPark: TdmAutoPark;
@@ -59,6 +60,7 @@ var
   CarModels: array of TCarModel;
   Cars: array of TCarRec;
   ListOrder: array of integer;
+  CurList: TPathListRec;
 
 implementation
 
@@ -67,22 +69,37 @@ implementation
 {$R *.dfm}
 
 uses
-  System.DateUtils, Dialogs;
+  System.DateUtils, Dialogs, System.UITypes;
 
-function GetDriverShortName(aID: integer): string;
+function GetDriverName(aID: integer; aShort: boolean = true): string;
 begin
   result:='???';
   if (aID < 0) or (aID > High(Drivers)) then exit;
-  result:=Drivers[aID].sSurName+' '+Copy(Drivers[aID].sName,1,1)
-          +'.'+Copy(Drivers[aID].sPatronymic,1,1)+'.';
+  if aShort then result:=Drivers[aID].sSurName+' '+Copy(Drivers[aID].sName,1,1)
+          +'.'+Copy(Drivers[aID].sPatronymic,1,1)+'.'
+  else  result:=Drivers[aID].sSurName+' '+Drivers[aID].sName+' '+Drivers[aID].sPatronymic;
+
 end;
 
-function GetDispShortName(aID: integer): string;
+function GetDispName(aID: integer; aShort: boolean = true): string;
 begin
   result:='???';
   if (aID < 0) or (aID > High(Dispatchers)) then exit;
-  result:=Dispatchers[aID].sSurName+' '+Copy(Dispatchers[aID].sName,1,1)
-          +'.'+Copy(Dispatchers[aID].sPatronymic,1,1)+'.';
+  if aShort then result:=Dispatchers[aID].sSurName+' '+Copy(Dispatchers[aID].sName,1,1)
+          +'.'+Copy(Dispatchers[aID].sPatronymic,1,1)+'.'
+  else result:=Dispatchers[aID].sSurName+' '+Dispatchers[aID].sName
+          +' '+Dispatchers[aID].sPatronymic;
+end;
+
+function GetCarName(aID: integer; aShort: boolean = true): string;
+var
+  k: integer;
+begin
+  result:='???';
+  if (aID < 0) or (aID > High(Dispatchers)) then exit;
+  k:=Cars[aID].iModelID;
+  result:=Cars[aID].sNumber;
+  if not aShort then result:=CarModels[k].sFirm+' '+CarModels[k].sModel+' '+result;
 end;
 
 function TdmAutoPark.GetData: boolean;
@@ -261,7 +278,7 @@ begin
   end;
   with ADOQuery do begin
     SQL.Clear;
-    s:='INSERT pathlists(
+//    s:='INSERT pathlists(
     SQL.Add(s);
     i:=ExecSQL;
   end;

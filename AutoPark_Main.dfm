@@ -25,7 +25,6 @@ object frmAutoParkMain: TfrmAutoParkMain
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 893
     object cbShowDelete: TCheckBox
       Left = 8
       Top = 12
@@ -36,6 +35,16 @@ object frmAutoParkMain: TfrmAutoParkMain
       State = cbChecked
       TabOrder = 0
       OnClick = cbShowDeleteClick
+    end
+    object Button1: TButton
+      Left = 368
+      Top = 2
+      Width = 81
+      Height = 35
+      Caption = #1053#1086#1074#1099#1081' '#1087#1091#1090#1077#1074#1086#1081' '#1083#1080#1089#1090
+      TabOrder = 1
+      WordWrap = True
+      OnClick = Button1Click
     end
   end
   object sgPathLists: TStringGrid
@@ -51,7 +60,5 @@ object frmAutoParkMain: TfrmAutoParkMain
     ScrollBars = ssVertical
     TabOrder = 1
     OnDrawCell = sgPathListsDrawCell
-    ExplicitWidth = 893
-    ExplicitHeight = 296
   end
 end
