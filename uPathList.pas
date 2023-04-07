@@ -1,4 +1,4 @@
-unit PathList;
+unit uPathList;
 
 interface
 
@@ -35,7 +35,7 @@ type
     fdFuel, fdPath: double;
   public
     { Public declarations }
-    function DoList(var aData: TPathListRec): boolean;
+    function DoPathList(var aData: TDataRec): boolean;
   end;
 
 var
@@ -45,23 +45,7 @@ implementation
 
 {$R *.dfm}
 
-function floatBoolValidation(s: string; var d: double): boolean;
-var
-  i: integer;
-  c: char;
-begin
-  c:=TFormatSettings.Create.DecimalSeparator;
-  result:=true;
-  i:=Pos('.',s);
-  if i > 0 then s[i]:=c;
-  i:=Pos(',',s);
-  if i > 0 then s[i]:=c;
-  try
-    d:=StrToFloat(s);
-  except
-    result:=false;
-  end;
-end;
+uses uCommon;
 
 procedure TfrmPathList.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
@@ -70,43 +54,63 @@ begin
   CanClose:=false;
   if edFuel.Text = '' then begin
     MessageDlg('Не указан расход топлива',mtError,[mbOk],0);
+    edFuel.SetFocus;
     exit;
   end;
   if not floatBoolValidation(edFuel.Text,fdFuel) then begin
     MessageDlg('Неверно указан расход топлива',mtError,[mbOk],0);
+    edFuel.SetFocus;
+    exit;
+  end;
+  if fdFuel < 0 then begin
+    MessageDlg('Расход топлива не может быть отрицательным',mtError,[mbOk],0);
+    edFuel.SetFocus;
     exit;
   end;
   if edPath.Text = '' then begin
     MessageDlg('Не указан пробег',mtError,[mbOk],0);
+    edPath.SetFocus;
     exit;
   end;
   if not floatBoolValidation(edPath.Text,fdPath) then begin
     MessageDlg('Неверно указан пробег',mtError,[mbOk],0);
+    edPath.SetFocus;
+    exit;
+  end;
+  if fdPath < 0 then begin
+    MessageDlg('Пробег не может быть отрицательным',mtError,[mbOk],0);
+    edPath.SetFocus;
     exit;
   end;
   if cbCar.Text = '' then begin
     MessageDlg('Не выбран автомобиль',mtError,[mbOk],0);
+    cbCar.SetFocus;
     exit;
   end;
   if cbDriver.Text = '' then begin
     MessageDlg('Не выбран водитель',mtError,[mbOk],0);
+    cbDriver.SetFocus;
     exit;
   end;
   if cbDisp.Text = '' then begin
     MessageDlg('Не выбран диспетчер',mtError,[mbOk],0);
+    cbDisp.SetFocus;
     exit;
   end;
   if cbIn.Checked and (not cbOut.Checked) then begin
     MessageDlg('Указано время возвращения'#13'но не указано время выезда',mtError,[mbOk],0);
+    cbOut.SetFocus;
     exit;
   end;
   if cbIn.Checked and cbOut.Checked then begin
     if dpDateOut.Date > dpDateIn.Date then begin
       MessageDlg('Дата возвращения раньше даты выезда',mtError,[mbOk],0);
+      dpDateOut.SetFocus;
       exit;
     end;
     if (dpDateOut.Date = dpDateIn.Date) and (tpTimeOut.Time < tpTimeIn.Time) then begin
       MessageDlg('Время возвращения раньше времени выезда',mtError,[mbOk],0);
+      tpTimeOut.SetFocus;
       exit;
     end;
   end;
@@ -125,7 +129,7 @@ begin
   dpDateIn.Visible:=cbIn.Checked;
 end;
 
-function TfrmPathList.DoList(var aData: TPathListRec): boolean;
+function TfrmPathList.DoPathList(var aData: TDataRec): boolean;
 var
   i: integer;
 begin
@@ -156,7 +160,7 @@ begin
     cbDriver.Enabled:=false;
     cbDisp.Text:=GetDispName(iDispID,false);
     cbDisp.Enabled:=false;
-    cbCar.Text:=GetDispName(iCarID,false);
+    cbCar.Text:=GetCarName(iCarID,false);
     cbCar.Enabled:=false;
     if tTimeIn = 0 then cbIn.Checked:=false
     else begin
@@ -171,7 +175,7 @@ begin
       tpTimeOut.Time:=Frac(tTimeOut);
     end;
     edFuel.Text:=format('%.1f',[dFuel]);
-    edPath.Text:=format('%.1f',[dPath]);
+    edPath.Text:=format('%.1f',[dlPath]);
     cbDeleted.Checked:=bDeleted;
   end;
 
@@ -187,7 +191,7 @@ begin
     if cbOut.Checked then tTimeOut:=dpDateOut.Date+tpTimeOut.Time
     else tTimeOut:=0;
     dFuel:=fdFuel;
-    dPath:=fdPath;
+    dlPath:=fdPath;
     bDeleted:=cbDeleted.Checked;
   end;
   result:=true;

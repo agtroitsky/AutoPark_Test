@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.ExtCtrls, Vcl.StdCtrls, System.UITypes;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.ExtCtrls, Vcl.StdCtrls, System.UITypes,
+  Vcl.Buttons, Vcl.Menus;
 
 type
   TfrmAutoParkMain = class(TForm)
@@ -12,12 +13,24 @@ type
     sgPathLists: TStringGrid;
     cbShowDelete: TCheckBox;
     Button1: TButton;
+    SpeedButton1: TSpeedButton;
+    MainMenu1: TMainMenu;
+    N1: TMenuItem;
+    miDrivers: TMenuItem;
+    miDisps: TMenuItem;
+    miCarModels: TMenuItem;
+    miCars: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure sgPathListsDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
     procedure cbShowDeleteClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure miDriversClick(Sender: TObject);
+    procedure miDispsClick(Sender: TObject);
+    procedure miCarModelsClick(Sender: TObject);
+    procedure miCarsClick(Sender: TObject);
   private
     { Private declarations }
     procedure GridUpdate;
@@ -34,7 +47,7 @@ implementation
 
 {$R *.dfm}
 
-uses AutoPark_Data, PathList;
+uses AutoPark_Data, uPathList, uCar, uList;
 
 var
   lflag: boolean = true;
@@ -52,7 +65,7 @@ begin
       Cells[2,i]:=GetDriverName(iDriverID);
       Cells[3,i]:=FormatDateTime('hh:nn dd.mm.yyyy',tTimeIn);
       Cells[4,i]:=FormatDateTime('hh:nn dd.mm.yyyy',tTimeOut);
-      Cells[5,i]:=format('%.1f',[dPath]);
+      Cells[5,i]:=format('%.1f',[dlPath]);
       Cells[6,i]:=format('%.1f',[dFuel]);
       Cells[7,i]:=GetDispName(iDriverID);
     end;
@@ -77,9 +90,32 @@ begin
   for i:=High(ListOrder) downto 0 do if PathLists[ListOrder[i]].bDeleted then Delete(ListOrder,i,1);
 end;
 
-procedure TfrmAutoParkMain.Button1Click(Sender: TObject);
+procedure TfrmAutoParkMain.miCarModelsClick(Sender: TObject);
 begin
-  if not frmPathList.DoList(-1) then exit;
+  frmList.DoList(stCarModel);
+end;
+
+procedure TfrmAutoParkMain.miCarsClick(Sender: TObject);
+begin
+  frmList.DoList(stCar);
+end;
+
+procedure TfrmAutoParkMain.miDispsClick(Sender: TObject);
+begin
+  frmList.DoList(stDispatcher);
+end;
+
+procedure TfrmAutoParkMain.miDriversClick(Sender: TObject);
+begin
+  frmList.DoList(stDriver);
+end;
+
+procedure TfrmAutoParkMain.Button1Click(Sender: TObject);
+var
+  rList: TDataRec;
+begin
+  rList.iID:=-1;
+  if not frmPathList.DoPathList(rList) then exit;
 end;
 
 procedure TfrmAutoParkMain.cbShowDeleteClick(Sender: TObject);
@@ -137,15 +173,14 @@ end;
 procedure TfrmAutoParkMain.sgPathListsDrawCell(Sender: TObject; ACol,
                     ARow: Integer; Rect: TRect; State: TGridDrawState);
 var
-  i: integer;
+  i,selRow: integer;
   s: string;
-  selRect: TGridRect;
 begin
   s:=sgPathLists.Cells[ACol,ARow];
-  selRect:=sgPathLists.Selection;
+  selRow:=sgPathLists.Selection.Top;
   with sgPathLists.Canvas do begin
     if gdFixed in State then Brush.Color:=clBtnFace
-    else if ARow = selRect.Top then Brush.Color:=clSkyBlue
+    else if ARow = selRow then Brush.Color:=clSkyBlue
     else Brush.Color:=clWhite;
     FillRect(Rect);
     Font.Color:=clBlack;
@@ -155,7 +190,17 @@ begin
     end;
     TextOut(Rect.Left+5,Rect.Top+5,s);
   end;
+end;
 
+procedure TfrmAutoParkMain.SpeedButton1Click(Sender: TObject);
+var
+  Car: TDataRec;
+begin
+  Car:=CarModels[0];
+  frmCar.ShowModal;
+exit;
+  Car.iID:=-1;
+  dmAutoPark.DoCarModelData(Car);
 end;
 
 end.

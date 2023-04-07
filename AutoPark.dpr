@@ -4,7 +4,11 @@ uses
   Vcl.Forms,
   AutoPark_Main in 'AutoPark_Main.pas' {frmAutoParkMain},
   AutoPark_Data in 'AutoPark_Data.pas' {dmAutoPark: TDataModule},
-  PathList in 'PathList.pas' {frmPathList};
+  uPathList in 'uPathList.pas' {frmPathList},
+  uCar in 'uCar.pas' {frmCar},
+  uCommon in 'uCommon.pas',
+  uList in 'uList.pas' {frmList},
+  uCarModel in 'uCarModel.pas' {frmCarModel};
 
 {$R *.res}
 
@@ -14,5 +18,8 @@ begin
   Application.CreateForm(TfrmAutoParkMain, frmAutoParkMain);
   Application.CreateForm(TdmAutoPark, dmAutoPark);
   Application.CreateForm(TfrmPathList, frmPathList);
+  Application.CreateForm(TfrmCar, frmCar);
+  Application.CreateForm(TfrmList, frmList);
+  Application.CreateForm(TfrmCarModel, frmCarModel);
   Application.Run;
 end.

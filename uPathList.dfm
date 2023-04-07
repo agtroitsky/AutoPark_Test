@@ -1,10 +1,11 @@
 object frmPathList: TfrmPathList
   Left = 0
   Top = 0
-  BorderIcons = [biSystemMenu, biMinimize]
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
   Caption = #1055#1091#1090#1077#1074#1086#1081' '#1083#1080#1089#1090
-  ClientHeight = 351
-  ClientWidth = 276
+  ClientHeight = 361
+  ClientWidth = 286
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

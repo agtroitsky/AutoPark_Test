@@ -105,8 +105,21 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="PathList.pas">
+        <DCCReference Include="uPathList.pas">
             <Form>frmPathList</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uCar.pas">
+            <Form>frmCar</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uCommon.pas"/>
+        <DCCReference Include="uList.pas">
+            <Form>frmList</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uCarModel.pas">
+            <Form>frmCarModel</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">

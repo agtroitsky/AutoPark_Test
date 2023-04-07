@@ -12,6 +12,7 @@ object frmAutoParkMain: TfrmAutoParkMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Menu = MainMenu1
   OldCreateOrder = False
   Position = poDesktopCenter
   OnActivate = FormActivate
@@ -25,6 +26,13 @@ object frmAutoParkMain: TfrmAutoParkMain
     Height = 41
     Align = alTop
     TabOrder = 0
+    object SpeedButton1: TSpeedButton
+      Left = 232
+      Top = 13
+      Width = 23
+      Height = 22
+      OnClick = SpeedButton1Click
+    end
     object cbShowDelete: TCheckBox
       Left = 8
       Top = 12
@@ -60,5 +68,28 @@ object frmAutoParkMain: TfrmAutoParkMain
     ScrollBars = ssVertical
     TabOrder = 1
     OnDrawCell = sgPathListsDrawCell
+  end
+  object MainMenu1: TMainMenu
+    Left = 16
+    Top = 304
+    object N1: TMenuItem
+      Caption = #1057#1087#1088#1072#1074#1086#1095#1085#1080#1082#1080
+      object miDrivers: TMenuItem
+        Caption = #1042#1086#1076#1080#1090#1077#1083#1080
+        OnClick = miDriversClick
+      end
+      object miDisps: TMenuItem
+        Caption = #1044#1080#1089#1087#1077#1090#1095#1077#1088#1099
+        OnClick = miDispsClick
+      end
+      object miCarModels: TMenuItem
+        Caption = #1052#1086#1076#1077#1083#1080' '#1072#1074#1090#1086#1084#1086#1073#1080#1083#1077#1081
+        OnClick = miCarModelsClick
+      end
+      object miCars: TMenuItem
+        Caption = #1040#1074#1090#1086#1084#1086#1073#1080#1083#1080
+        OnClick = miCarsClick
+      end
+    end
   end
 end
