@@ -10,3 +10,6 @@ CREATE TABLE `auto_test`.`cars` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = cp1251
 COMMENT = 'Таблица автомобилей';
+
+ALTER TABLE `auto_test`.`cars` 
+CHANGE COLUMN `year` `year` YEAR(4) NOT NULL ;

@@ -2,10 +2,9 @@ object frmAutoParkMain: TfrmAutoParkMain
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
-  BorderStyle = bsSingle
   Caption = #1055#1091#1090#1077#1074#1099#1077' '#1083#1080#1089#1090#1099
-  ClientHeight = 347
-  ClientWidth = 903
+  ClientHeight = 337
+  ClientWidth = 893
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,10 +21,11 @@ object frmAutoParkMain: TfrmAutoParkMain
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 903
+    Width = 893
     Height = 41
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 903
     object SpeedButton1: TSpeedButton
       Left = 232
       Top = 13
@@ -42,9 +42,8 @@ object frmAutoParkMain: TfrmAutoParkMain
       Checked = True
       State = cbChecked
       TabOrder = 0
-      OnClick = cbShowDeleteClick
     end
-    object Button1: TButton
+    object btnNew: TButton
       Left = 368
       Top = 2
       Width = 81
@@ -52,22 +51,24 @@ object frmAutoParkMain: TfrmAutoParkMain
       Caption = #1053#1086#1074#1099#1081' '#1087#1091#1090#1077#1074#1086#1081' '#1083#1080#1089#1090
       TabOrder = 1
       WordWrap = True
-      OnClick = Button1Click
+      OnClick = btnNewClick
     end
   end
   object sgPathLists: TStringGrid
     Left = 0
     Top = 41
-    Width = 903
-    Height = 306
+    Width = 893
+    Height = 296
     Align = alClient
     DefaultDrawing = False
     DrawingStyle = gdsGradient
     FixedCols = 0
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSelect]
-    ScrollBars = ssVertical
     TabOrder = 1
+    OnDblClick = sgPathListsDblClick
     OnDrawCell = sgPathListsDrawCell
+    ExplicitWidth = 903
+    ExplicitHeight = 306
   end
   object MainMenu1: TMainMenu
     Left = 16

@@ -48,16 +48,14 @@ implementation
 uses uCommon;
 
 procedure TfrmPathList.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var
+  i: integer;
 begin
   CanClose:=true;
   if ModalResult <> mrOk then exit;
   CanClose:=false;
-  if edFuel.Text = '' then begin
-    MessageDlg('Не указан расход топлива',mtError,[mbOk],0);
-    edFuel.SetFocus;
-    exit;
-  end;
-  if not floatBoolValidation(edFuel.Text,fdFuel) then begin
+  if edFuel.Text = '' then fdfuel:=0
+  else if not floatBoolValidation(edFuel.Text,fdFuel) then begin
     MessageDlg('Неверно указан расход топлива',mtError,[mbOk],0);
     edFuel.SetFocus;
     exit;
@@ -67,12 +65,8 @@ begin
     edFuel.SetFocus;
     exit;
   end;
-  if edPath.Text = '' then begin
-    MessageDlg('Не указан пробег',mtError,[mbOk],0);
-    edPath.SetFocus;
-    exit;
-  end;
-  if not floatBoolValidation(edPath.Text,fdPath) then begin
+  if edPath.Text = '' then fdPath:=0
+  else if not floatBoolValidation(edPath.Text,fdPath) then begin
     MessageDlg('Неверно указан пробег',mtError,[mbOk],0);
     edPath.SetFocus;
     exit;
@@ -95,6 +89,23 @@ begin
   if cbDisp.Text = '' then begin
     MessageDlg('Не выбран диспетчер',mtError,[mbOk],0);
     cbDisp.SetFocus;
+    exit;
+  end;
+  i:=Drivers[Integer(cbDriver.Items.Objects[cbDriver.ItemIndex])].iID;
+  i:=Dispatchers[Integer(cbDisp.Items.Objects[cbDisp.ItemIndex])].iID;
+  i:=Cars[Integer(cbCar.Items.Objects[cbCar.ItemIndex])].iID;
+  if Drivers[i].bDeleted then begin
+    MessageDlg('Указан удаленный водитель',mtError,[mbOk],0);
+    exit;
+  end;
+  i:=Cars[Integer(cbCar.Items.Objects[cbCar.ItemIndex])].iID;
+  if Cars[i].bDeleted then begin
+    MessageDlg('Указан удаленный автомобиль',mtError,[mbOk],0);
+    exit;
+  end;
+  i:=Dispatchers[Integer(cbDisp.Items.Objects[cbDisp.ItemIndex])].iID;
+  if Dispatchers[i].bDeleted then begin
+    MessageDlg('Указан удаленный диспетчер',mtError,[mbOk],0);
     exit;
   end;
   if cbIn.Checked and (not cbOut.Checked) then begin
@@ -137,38 +148,53 @@ begin
   if aData.iID < 0 then i:=Length(PathLists) else i:=aData.iID;
   Caption:='Путевой лист №'+IntToStr(i+1);
   if aData.iID < 0 then begin
-    cbDriver.Enabled:=true;
     cbDriver.Items.Clear;
     for i:=0 to High(Drivers) do if not Drivers[i].bDeleted then
-      cbDriver.Items.AddObject(GetDriverName(i,false),TObject(i));
-    cbDisp.Enabled:=true;
+      cbDriver.Items.AddObject(GetDriverName(Drivers[i].iID,false),TObject(i));
     cbDisp.Items.Clear;
     for i:=0 to High(Dispatchers) do if not Dispatchers[i].bDeleted then
-        cbDisp.Items.AddObject(GetDispName(i,false),TObject(i));
-    cbCar.Enabled:=true;
+        cbDisp.Items.AddObject(GetDispatcherName(Dispatchers[i].iID,false),TObject(i));
     cbCar.Items.Clear;
     for i:=0 to High(Cars) do if not Cars[i].bDeleted then
-        cbCar.Items.AddObject(GetCarName(i,false),TObject(i));
+        cbCar.Items.AddObject(GetCarName(Cars[i].iID,false),TObject(i));
     cbOut.Checked:=false;
+    dpDateOut.Date:=Int(Now);
+    tpTimeOut.Time:=Frac(Now);
     cbIn.Checked:=false;
+    dpDateIn.Date:=Int(Now);
+    tpTimeIn.Time:=Frac(Now);
     edFuel.Text:='';
     edPath.Text:='';
     cbDeleted.Checked:=false;
   end
   else with aData do begin
-    cbDriver.Text:=GetDriverName(iDriverID,false);
-    cbDriver.Enabled:=false;
-    cbDisp.Text:=GetDispName(iDispID,false);
-    cbDisp.Enabled:=false;
-    cbCar.Text:=GetCarName(iCarID,false);
-    cbCar.Enabled:=false;
-    if tTimeIn = 0 then cbIn.Checked:=false
+    cbDriver.Items.Clear;
+    for i:=0 to High(Drivers) do if not Drivers[i].bDeleted then
+      cbDriver.Items.AddObject(GetDriverName(Drivers[i].iID,false),TObject(i));
+    cbDriver.ItemIndex:=cbDriver.Items.IndexOf(GetDriverName(iDriverID,false));
+    cbDisp.Items.Clear;
+    for i:=0 to High(Dispatchers) do if not Dispatchers[i].bDeleted then
+        cbDisp.Items.AddObject(GetDispatcherName(Dispatchers[i].iID,false),TObject(i));
+    cbDisp.ItemIndex:=cbDisp.Items.IndexOf(GetDispatcherName(iDispID,false));
+    cbCar.Items.Clear;
+    for i:=0 to High(Cars) do if not Cars[i].bDeleted then
+        cbCar.Items.AddObject(GetCarName(Cars[i].iID,false),TObject(i));
+    cbCar.ItemIndex:=cbCar.Items.IndexOf(GetCarName(iCarID,false));
+    if tTimeIn = 0 then begin
+      cbIn.Checked:=false;
+      dpDateIn.Date:=Int(Now);
+      tpTimeIn.Time:=Frac(Now);
+    end
     else begin
       cbIn.Checked:=true;
       dpDateIn.Date:=Int(tTimeIn);
       tpTimeIn.Time:=Frac(tTimeIn);
     end;
-    if tTimeOut = 0 then cbOut.Checked:=false
+    if tTimeOut = 0 then begin
+      cbOut.Checked:=false;
+      dpDateOut.Date:=Int(Now);
+      tpTimeOut.Time:=Frac(Now);
+    end
     else begin
       cbOut.Checked:=true;
       dpDateOut.Date:=Int(tTimeOut);
@@ -181,14 +207,12 @@ begin
 
   if ShowModal <> mrOk then exit;
   with aData do begin
-    if iID < 0 then begin
-      iDriverID:=Integer(cbDriver.Items.Objects[cbDriver.ItemIndex]);
-      iDispID:=Integer(cbDisp.Items.Objects[cbDisp.ItemIndex]);
-      iCarID:=Integer(cbCar.Items.Objects[cbCar.ItemIndex]);
-    end;
-    if cbIn.Checked then tTimeIn:=dpDateIn.Date+tpTimeIn.Time
+    iDriverID:=Drivers[Integer(cbDriver.Items.Objects[cbDriver.ItemIndex])].iID;
+    iDispID:=Dispatchers[Integer(cbDisp.Items.Objects[cbDisp.ItemIndex])].iID;
+    iCarID:=Cars[Integer(cbCar.Items.Objects[cbCar.ItemIndex])].iID;
+    if cbIn.Checked then tTimeIn:=Int(dpDateIn.Date)+Frac(tpTimeIn.Time)
     else tTimeIn:=0;
-    if cbOut.Checked then tTimeOut:=dpDateOut.Date+tpTimeOut.Time
+    if cbOut.Checked then tTimeOut:=Int(dpDateOut.Date)+Frac(tpTimeOut.Time)
     else tTimeOut:=0;
     dFuel:=fdFuel;
     dlPath:=fdPath;

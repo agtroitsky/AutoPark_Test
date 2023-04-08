@@ -8,7 +8,8 @@ uses
   uCar in 'uCar.pas' {frmCar},
   uCommon in 'uCommon.pas',
   uList in 'uList.pas' {frmList},
-  uCarModel in 'uCarModel.pas' {frmCarModel};
+  uCarModel in 'uCarModel.pas' {frmCarModel},
+  uPers in 'uPers.pas' {frmPers};
 
 {$R *.res}
 
@@ -21,5 +22,6 @@ begin
   Application.CreateForm(TfrmCar, frmCar);
   Application.CreateForm(TfrmList, frmList);
   Application.CreateForm(TfrmCarModel, frmCarModel);
+  Application.CreateForm(TfrmPers, frmPers);
   Application.Run;
 end.

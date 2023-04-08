@@ -12,7 +12,7 @@ type
     Panel1: TPanel;
     sgPathLists: TStringGrid;
     cbShowDelete: TCheckBox;
-    Button1: TButton;
+    btnNew: TButton;
     SpeedButton1: TSpeedButton;
     MainMenu1: TMainMenu;
     N1: TMenuItem;
@@ -24,18 +24,16 @@ type
     procedure FormActivate(Sender: TObject);
     procedure sgPathListsDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
-    procedure cbShowDeleteClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure btnNewClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure miDriversClick(Sender: TObject);
     procedure miDispsClick(Sender: TObject);
     procedure miCarModelsClick(Sender: TObject);
     procedure miCarsClick(Sender: TObject);
+    procedure sgPathListsDblClick(Sender: TObject);
   private
     { Private declarations }
     procedure GridUpdate;
-    procedure GridClear;
-    procedure HideDelete;
   public
     { Public declarations }
   end;
@@ -56,38 +54,22 @@ procedure TfrmAutoParkMain.GridUpdate;
 var
   i,k: integer;
 begin
-  sgPathLists.RowCount:=Length(ListOrder)+1;
-  for i:=1 to Length(ListOrder) do begin
-    k:=ListOrder[i-1];
-    with sgPathLists do with PathLists[k] do begin
-      Cells[0,i]:=IntToStr(k+1);
-      Cells[1,i]:=Cars[iCarID].sNumber;
-      Cells[2,i]:=GetDriverName(iDriverID);
-      Cells[3,i]:=FormatDateTime('hh:nn dd.mm.yyyy',tTimeIn);
-      Cells[4,i]:=FormatDateTime('hh:nn dd.mm.yyyy',tTimeOut);
-      Cells[5,i]:=format('%.1f',[dlPath]);
+  if not dmAutoPark.GetViewLists then exit;
+  sgPathLists.RowCount:=Length(ViewLists)+1;
+  for i:=1 to Length(ViewLists) do begin
+    with sgPathLists do with ViewLists[i-1] do begin
+      Cells[0,i]:=IntToStr(iID);
+      Cells[1,i]:=sCar;
+      Cells[2,i]:=sDriver;
+      if tTimeOut = 0 then Cells[3,i]:=''
+      else Cells[3,i]:=FormatDateTime('hh:nn dd.mm.yyyy',tTimeOut);
+      if tTimeIn = 0 then Cells[4,i]:=''
+      else Cells[4,i]:=FormatDateTime('hh:nn dd.mm.yyyy',tTimeIn);
+      Cells[5,i]:=format('%.1f',[dPath]);
       Cells[6,i]:=format('%.1f',[dFuel]);
-      Cells[7,i]:=GetDispName(iDriverID);
+      Cells[7,i]:=sDispatcher;
     end;
   end;
-end;
-
-procedure TfrmAutoParkMain.GridClear;
-var
-  i: integer;
-begin
-  with sgPathLists do begin
-    RowCount:=2;
-    for i:=0 to ColCount-1 do Cells[i,1]:='';
-  end;
-end;
-
-procedure TfrmAutoParkMain.HideDelete;
-var
-  i: integer;
-begin
-  if cbShowDelete.Checked then exit;
-  for i:=High(ListOrder) downto 0 do if PathLists[ListOrder[i]].bDeleted then Delete(ListOrder,i,1);
 end;
 
 procedure TfrmAutoParkMain.miCarModelsClick(Sender: TObject);
@@ -110,35 +92,40 @@ begin
   frmList.DoList(stDriver);
 end;
 
-procedure TfrmAutoParkMain.Button1Click(Sender: TObject);
+procedure TfrmAutoParkMain.btnNewClick(Sender: TObject);
 var
-  rList: TDataRec;
+  i: integer;
+  aData: TDataRec;
 begin
-  rList.iID:=-1;
-  if not frmPathList.DoPathList(rList) then exit;
+  aData.iID:=-1;
+  if not frmPathList.DoPathList(aData) then exit;
+  if not dmAutoPark.DoPathListData(aData) then exit;
+  i:=Length(PathLists);
+  aData.iID:=i+1;
+  SetLength(PathLists,i+1);
+  PathLists[i]:=aData;
+  GridUpdate;
 end;
 
-procedure TfrmAutoParkMain.cbShowDeleteClick(Sender: TObject);
+procedure TfrmAutoParkMain.sgPathListsDblClick(Sender: TObject);
+var
+  i: integer;
+  aData: TDataRec;
 begin
-  if dmAutoPark.GetData then begin
-    HideDelete;
-    GridUpdate;
-  end
-  else GridClear;
+  i:=ViewLists[sgPathLists.Selection.Top-1].iID-1;
+  aData:=PathLists[i];
+  if not frmPathList.DoPathList(aData) then exit;
+  if not dmAutoPark.DoPathListData(aData) then exit;
+  PathLists[i]:=aData;
+  GridUpdate;
 end;
 
 procedure TfrmAutoParkMain.FormActivate(Sender: TObject);
 begin
   if not lflag then exit;
   lflag:=false;
-
-  if dmAutoPark.GetData then begin
-    HideDelete;
-    GridUpdate;
-  end
-  else GridClear;
-
-
+  if not dmAutoPark.GetAllData then exit;
+  GridUpdate;
 end;
 
 procedure TfrmAutoParkMain.FormCreate(Sender: TObject);
@@ -156,13 +143,13 @@ begin
     Cells[5,0]:='Пробег, км';
     Cells[6,0]:='Бензин, л';
     Cells[7,0]:='Диспетчер';
-    ColWidths[0]:=50;
+    ColWidths[0]:=30;
     ColWidths[1]:=100;
     ColWidths[2]:=150;
-    ColWidths[3]:=120;
-    ColWidths[4]:=120;
-    ColWidths[5]:=90;
-    ColWidths[6]:=90;
+    ColWidths[3]:=100;
+    ColWidths[4]:=100;
+    ColWidths[5]:=70;
+    ColWidths[6]:=70;
     ColWidths[7]:=150;
     n:=0;
     for i:=0 to ColCount-1 do n:=n+ColWidths[i];
@@ -176,6 +163,7 @@ var
   i,selRow: integer;
   s: string;
 begin
+  if Length(ViewLists) = 0 then exit;
   s:=sgPathLists.Cells[ACol,ARow];
   selRow:=sgPathLists.Selection.Top;
   with sgPathLists.Canvas do begin
@@ -184,9 +172,11 @@ begin
     else Brush.Color:=clWhite;
     FillRect(Rect);
     Font.Color:=clBlack;
-    if ARow <> 0 then begin
-      i:=StrToInt(sgPathLists.Cells[0,ARow])-1;
-      if PathLists[i].bDeleted then Font.Color:=clRed;
+    if ARow <> 0 then if ViewLists[aRow-1].bDeleted then Font.Color:=clRed;
+    i:=TextWidth(s) - sgPathLists.ColWidths[ACol]+10;
+    if i > 0 then begin
+      sgPathLists.ColWidths[ACol]:=sgPathLists.ColWidths[ACol]+i;
+      sgPathLists.Width:=sgPathLists.Width+i;
     end;
     TextOut(Rect.Left+5,Rect.Top+5,s);
   end;

@@ -11,9 +11,12 @@ object frmCarModel: TfrmCarModel
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poMainFormCenter
   OnCloseQuery = FormCloseQuery
+  OnKeyDown = FormKeyDown
+  OnShow = FormShow
   DesignSize = (
     208
     140)
@@ -43,13 +46,12 @@ object frmCarModel: TfrmCarModel
     Width = 125
     Height = 21
     Anchors = [akLeft, akBottom]
-    TabOrder = 0
-    ExplicitTop = 166
+    TabOrder = 1
   end
   object cbDeleted: TCheckBox
     Left = 59
     Top = 69
-    Width = 77
+    Width = 84
     Height = 20
     Anchors = [akLeft, akBottom]
     Caption = #1059#1076#1072#1083#1077#1085#1072
@@ -61,12 +63,11 @@ object frmCarModel: TfrmCarModel
     Font.Style = []
     ParentColor = False
     ParentFont = False
-    TabOrder = 1
-    ExplicitTop = 193
+    TabOrder = 2
   end
   object btnOk: TButton
-    Left = 11
-    Top = 102
+    Left = 8
+    Top = 99
     Width = 86
     Height = 33
     Anchors = [akLeft, akBottom]
@@ -78,12 +79,11 @@ object frmCarModel: TfrmCarModel
     Font.Style = []
     ModalResult = 1
     ParentFont = False
-    TabOrder = 2
-    ExplicitTop = 226
+    TabOrder = 3
   end
   object btnCancel: TButton
     Left = 109
-    Top = 107
+    Top = 103
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -95,8 +95,7 @@ object frmCarModel: TfrmCarModel
     Font.Style = []
     ModalResult = 2
     ParentFont = False
-    TabOrder = 3
-    ExplicitTop = 231
+    TabOrder = 4
   end
   object edFirm: TEdit
     Left = 59
@@ -104,7 +103,6 @@ object frmCarModel: TfrmCarModel
     Width = 125
     Height = 21
     Anchors = [akLeft, akBottom]
-    TabOrder = 4
-    ExplicitTop = 139
+    TabOrder = 0
   end
 end

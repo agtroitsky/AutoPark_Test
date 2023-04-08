@@ -16,6 +16,8 @@ type
     Label1: TLabel;
     edFirm: TEdit;
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   public
@@ -60,13 +62,25 @@ begin
   CanClose:=true;
 end;
 
+procedure TfrmCarModel.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then ModalResult:=mrCancel;
+  if Key = VK_RETURN then ModalResult:=mrOk;
+end;
+
+procedure TfrmCarModel.FormShow(Sender: TObject);
+begin
+  edFirm.SetFocus;
+end;
+
 function TfrmCarModel.DoCarModel(var aData: TDataRec): boolean;
 var
   i: integer;
 begin
   result:=false;
-  if aData.iID < 0 then i:=Length(CarModels) else i:=aData.iID;
-  Caption:='Модель автомобиля '+IntToStr(i+1);
+  if aData.iID < 0 then i:=Length(CarModels)+1 else i:=aData.iID;
+  Caption:='Модель автомобиля '+IntToStr(i);
   if aData.iID < 0 then begin
     edFirm.Text:='';
     edModel.Text:='';
@@ -77,7 +91,6 @@ begin
     edModel.Text:=sModel;
     cbDeleted.Checked:=bDeleted;
   end;
-
   if ShowModal <> mrOk then exit;
   with aData do begin
     sFirm:=edFirm.Text;

@@ -23,6 +23,8 @@ type
     seYear: TSpinEdit;
     edNumber: TEdit;
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
     fdPath: double;
@@ -45,14 +47,13 @@ var
   i: integer;
 begin
   result:=false;
-  if aData.iID < 0 then i:=Length(Cars) else i:=aData.iID;
-  Caption:='Автомобиль '+IntToStr(i+1);
+  if aData.iID < 0 then i:=Length(Cars)+1 else i:=aData.iID;
+  Caption:='Автомобиль '+IntToStr(i);
   if aData.iID < 0 then begin
     edNumber.Text:='';
-    cbCarModel.Enabled:=true;
     cbCarModel.Items.Clear;
     for i:=0 to High(CarModels) do if not CarModels[i].bDeleted then
-      cbCarModel.Items.AddObject(GetCarModelName(i),TObject(i));
+      cbCarModel.Items.AddObject(GetCarModelName(CarModels[i].iID),TObject(i));
     seYear.Value:=CurrentYear;
     dpTODate.Date:=Int(Now);
     edPath.Text:='';
@@ -60,19 +61,18 @@ begin
   end
   else with aData do begin
     edNumber.Text:=sNumber;
-    cbCarModel.Enabled:=false;
-    cbCarModel.Text:=GetCarModelName(iCarModelID);
+    cbCarModel.Items.Clear;
+    for i:=0 to High(CarModels) do if not CarModels[i].bDeleted then
+      cbCarModel.Items.AddObject(GetCarModelName(CarModels[i].iID),TObject(i));
+    cbCarModel.ItemIndex:=cbCarModel.Items.IndexOf(GetCarModelName(iCarModelID));
     seYear.Value:=iYear;
     dpTODate.Date:=tLastTO;
     edPath.Text:=format('%.1f',[dcPath]);
     cbDeleted.Checked:=bDeleted;
   end;
-
   if ShowModal <> mrOk then exit;
   with aData do begin
-    if iID < 0 then begin
-      iCarModelID:=Integer(cbCarModel.Items.Objects[cbCarModel.ItemIndex]);
-    end;
+    iCarModelID:=CarModels[Integer(cbCarModel.Items.Objects[cbCarModel.ItemIndex])].iID;
     sNumber:=edNumber.Text;
     iYear:=seYear.Value;
     tLastTO:=dpTODate.Date;
@@ -113,6 +113,18 @@ begin
     exit;
   end;
   CanClose:=true;
+end;
+
+procedure TfrmCar.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then ModalResult:=mrCancel;
+  if Key = VK_RETURN then ModalResult:=mrOk;
+end;
+
+procedure TfrmCar.FormShow(Sender: TObject);
+begin
+  edNumber.SetFocus;
 end;
 
 end.

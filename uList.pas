@@ -37,7 +37,7 @@ implementation
 
 {$R *.dfm}
 
-uses AutoPark_Data, uCar, uCarModel;
+uses AutoPark_Data, uCar, uCarModel, uPers;
 
 procedure TfrmList.btnCreateClick(Sender: TObject);
 var
@@ -50,14 +50,41 @@ begin
       if not frmCarModel.DoCarModel(aData) then exit;
       if not dmAutoPark.DoCarModelData(aData) then exit;
       i:=Length(CarModels);
-      aData.iID:=i;
+      aData.iID:=i+1;
       SetLength(CarModels,i+1);
       CarModels[i]:=aData;
       sgList.RowCount:=i+1;
-      sgList.Cells[0,i]:=GetCarModelName(i);
+      sgList.Cells[0,i]:=GetCarModelName(CarModels[i].iID);
     end;
     stCar: begin
       if not frmCar.DoCar(aData) then exit;
+      if not dmAutoPark.DoCarData(aData) then exit;
+      i:=Length(Cars);
+      aData.iID:=i+1;
+      SetLength(Cars,i+1);
+      Cars[i]:=aData;
+      sgList.RowCount:=i+1;
+      sgList.Cells[0,i]:=GetCarName(Cars[i].iID,false);
+    end;
+    stDriver: begin
+      if not frmPers.DoDriver(aData) then exit;
+      if not dmAutoPark.DoDriverData(aData) then exit;
+      i:=Length(Drivers);
+      aData.iID:=i+1;
+      SetLength(Drivers,i+1);
+      Drivers[i]:=aData;
+      sgList.RowCount:=i+1;
+      sgList.Cells[0,i]:=GetDriverName(Drivers[i].iID,false);
+    end;
+    stDispatcher: begin
+      if not frmPers.DoDispatcher(aData) then exit;
+      if not dmAutoPark.DoDispatcherData(aData) then exit;
+      i:=Length(Dispatchers);
+      aData.iID:=i+1;
+      SetLength(Dispatchers,i+1);
+      Dispatchers[i]:=aData;
+      sgList.RowCount:=i+1;
+      sgList.Cells[0,i]:=GetDispatcherName(Dispatchers[i].iID,false);
     end;
   end;
 end;
@@ -71,25 +98,22 @@ begin
     stDriver: begin
       Caption:='Водители';
       sgList.RowCount:=Length(Drivers);
-      for i:=0 to High(Drivers) do sgList.Cells[0,i]:=GetDriverName(i,false);
+      for i:=0 to High(Drivers) do sgList.Cells[0,i]:=GetDriverName(Drivers[i].iID,false);
     end;
     stDispatcher: begin
       Caption:='Диспетчеры';
       sgList.RowCount:=Length(Dispatchers);
-      for i:=0 to High(Dispatchers) do sgList.Cells[0,i]:=GetDispName(i,false);
+      for i:=0 to High(Dispatchers) do sgList.Cells[0,i]:=GetDispatcherName(Dispatchers[i].iID,false);
     end;
     stCarModel: begin
       Caption:='Модели автомобилей';
       sgList.RowCount:=Length(CarModels);
-      for i:=0 to High(CarModels) do begin
-        sgList.Cells[0,i]:=GetCarModelName(i);
-        sgList.Objects[0,i]:=TObject(i);
-      end;
+      for i:=0 to High(CarModels) do sgList.Cells[0,i]:=GetCarModelName(CarModels[i].iID);
     end;
     stCar: begin
       Caption:='Автомобили';
       sgList.RowCount:=Length(Cars);
-      for i:=0 to High(Cars) do sgList.Cells[0,i]:=GetCarName(i,false);
+      for i:=0 to High(Cars) do sgList.Cells[0,i]:=GetCarName(Cars[i].iID,false);
     end;
     else begin
       MessageDlg('Неизвестный стиль'#13'Обратитесь к разработчику',mtError,[mbOk],0);
@@ -108,19 +132,38 @@ end;
 
 procedure TfrmList.sgListDblClick(Sender: TObject);
 var
-  i,selRow: integer;
+  i: integer;
   aData: TDataRec;
 begin
-  selRow:=sgList.Selection.Top;
-  i:=Integer(sgList.Objects[0,selRow]);
+  i:=sgList.Selection.Top;
   case fiStyle of
     stCarModel: begin
       aData:=CarModels[i];
       if not frmCarModel.DoCarModel(aData) then exit;
       if not dmAutoPark.DoCarModelData(aData) then exit;
       CarModels[i]:=aData;
-      sgList.Cells[0,selRow]:=GetCarModelName(i);
-
+      sgList.Cells[0,i]:=GetCarModelName(CarModels[i].iID);
+    end;
+    stCar: begin
+      aData:=Cars[i];
+      if not frmCar.DoCar(aData) then exit;
+      if not dmAutoPark.DoCarData(aData) then exit;
+      Cars[i]:=aData;
+      sgList.Cells[0,i]:=GetCarName(Cars[i].iID,false);
+    end;
+    stDriver: begin
+      aData:=Drivers[i];
+      if not frmPers.DoDriver(aData) then exit;
+      if not dmAutoPark.DoDriverData(aData) then exit;
+      Drivers[i]:=aData;
+      sgList.Cells[0,i]:=GetDriverName(Drivers[i].iID,false);
+    end;
+    stDispatcher: begin
+      aData:=Dispatchers[i];
+      if not frmPers.DoDispatcher(aData) then exit;
+      if not dmAutoPark.DoDispatcherData(aData) then exit;
+      Dispatchers[i]:=aData;
+      sgList.Cells[0,i]:=GetDispatcherName(Dispatchers[i].iID,false);
     end;
   end;
 end;
@@ -132,13 +175,14 @@ var
   s: string;
   bol: boolean;
 begin
+  if sgList.RowCount = 0 then exit;
   s:=sgList.Cells[ACol,ARow];
   selRow:=sgList.Selection.Top;
   case fiStyle of
-    stDriver: bol:=Drivers[ARow].bDeleted;
-    stDispatcher: bol:=Dispatchers[ARow].bDeleted;
-    stCarModel: bol:=CarModels[ARow].bDeleted;
-    stCar: bol:=Cars[ARow].bDeleted;
+    stDriver: if Length(Drivers) > 0 then bol:=Drivers[ARow].bDeleted else exit;
+    stDispatcher: if Length(Dispatchers) > 0 then bol:=Dispatchers[ARow].bDeleted else exit;
+    stCarModel: if Length(CarModels) > 0 then bol:=CarModels[ARow].bDeleted else exit;
+    stCar: if Length(Cars) > 0 then bol:=Cars[ARow].bDeleted else exit;
     else exit;
   end;
   with sgList.Canvas do begin

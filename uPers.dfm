@@ -1,11 +1,11 @@
-object frmCar: TfrmCar
+object frmPers: TfrmPers
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = #1040#1074#1090#1086#1084#1086#1073#1080#1083#1100
-  ClientHeight = 270
-  ClientWidth = 196
+  Caption = #1055#1077#1088#1089#1086#1085#1072#1083
+  ClientHeight = 248
+  ClientWidth = 199
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,68 +21,45 @@ object frmCar: TfrmCar
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
-    Left = 17
-    Top = 11
-    Width = 54
+    Left = 8
+    Top = 99
+    Width = 49
     Height = 13
-    Caption = #1043#1086#1089'. '#1085#1086#1084#1077#1088
-  end
-  object Label3: TLabel
-    Left = 17
-    Top = 32
-    Width = 39
-    Height = 13
-    Caption = #1052#1086#1076#1077#1083#1100
-  end
-  object Label2: TLabel
-    Left = 17
-    Top = 91
-    Width = 65
-    Height = 13
-    Caption = #1043#1086#1076' '#1074#1099#1087#1091#1089#1082#1072
+    Caption = #1054#1090#1095#1077#1089#1090#1074#1086
   end
   object Label4: TLabel
-    Left = 17
-    Top = 131
-    Width = 72
+    Left = 8
+    Top = 148
+    Width = 80
     Height = 13
-    Caption = #1055#1086#1089#1083#1077#1076#1085#1077#1077' '#1058#1054
+    Caption = #1044#1072#1090#1072' '#1088#1086#1078#1076#1077#1085#1080#1103
   end
-  object Label5: TLabel
-    Left = 17
-    Top = 169
-    Width = 55
+  object Label2: TLabel
+    Left = 8
+    Top = 53
+    Width = 19
     Height = 13
-    Caption = #1055#1088#1086#1073#1077#1075', '#1082#1084
+    Caption = #1048#1084#1103
   end
-  object cbCarModel: TComboBox
-    Left = 17
-    Top = 51
-    Width = 161
-    Height = 21
-    Style = csDropDownList
-    Sorted = True
-    TabOrder = 1
+  object Label3: TLabel
+    Left = 8
+    Top = 7
+    Width = 44
+    Height = 13
+    Caption = #1060#1072#1084#1080#1083#1080#1103
   end
-  object dpTODate: TDateTimePicker
-    Left = 97
-    Top = 127
+  object dpBirthDate: TDateTimePicker
+    Left = 110
+    Top = 146
     Width = 81
     Height = 21
     Date = 45022.548412060180000000
     Time = 45022.548412060180000000
     TabOrder = 3
   end
-  object edPath: TEdit
-    Left = 97
-    Top = 166
-    Width = 81
-    Height = 21
-    TabOrder = 4
-  end
   object cbDeleted: TCheckBox
     Left = 59
-    Top = 193
+    Top = 173
     Width = 77
     Height = 20
     Caption = #1059#1076#1072#1083#1077#1085
@@ -94,11 +71,11 @@ object frmCar: TfrmCar
     Font.Style = []
     ParentColor = False
     ParentFont = False
-    TabOrder = 5
+    TabOrder = 4
   end
   object btnOk: TButton
-    Left = 11
-    Top = 226
+    Left = 8
+    Top = 207
     Width = 86
     Height = 33
     Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
@@ -109,11 +86,11 @@ object frmCar: TfrmCar
     Font.Style = []
     ModalResult = 1
     ParentFont = False
-    TabOrder = 6
+    TabOrder = 5
   end
   object btnCancel: TButton
-    Left = 109
-    Top = 231
+    Left = 116
+    Top = 211
     Width = 75
     Height = 25
     Caption = #1054#1090#1084#1077#1085#1080#1090#1100
@@ -124,22 +101,26 @@ object frmCar: TfrmCar
     Font.Style = []
     ModalResult = 2
     ParentFont = False
-    TabOrder = 7
+    TabOrder = 6
   end
-  object seYear: TSpinEdit
-    Left = 97
-    Top = 88
-    Width = 81
-    Height = 22
-    MaxValue = 2023
-    MinValue = 1960
+  object edPatronymic: TEdit
+    Left = 9
+    Top = 119
+    Width = 182
+    Height = 21
     TabOrder = 2
-    Value = 1960
   end
-  object edNumber: TEdit
-    Left = 97
-    Top = 9
-    Width = 81
+  object edName: TEdit
+    Left = 8
+    Top = 72
+    Width = 182
+    Height = 21
+    TabOrder = 1
+  end
+  object edSurName: TEdit
+    Left = 8
+    Top = 26
+    Width = 182
     Height = 21
     TabOrder = 0
   end

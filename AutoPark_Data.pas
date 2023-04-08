@@ -26,41 +26,13 @@ type
       dcPath: double);
   end;
 
-{  TPathListRec = record
+  TViewRec = record
     iID: integer;
-    tTimeOut,tTimeIn: TDateTime;
-    iDriverID, iCarID, iDispID: integer;
+    bDeleted: boolean;
+    sCar, sDriver, sDispatcher: string;
     dFuel, dPath: double;
-    bDeleted: boolean;
+    tTimeIn, tTimeOut: TDateTime;
   end;
-
-  TDriverRec = record
-    iID: integer;
-    tBirthDate: TDate;
-    sName, sSurName, sPatronymic: string;
-    bDeleted: boolean;
-  end;
-
-  TDispatcherRec = record
-    iID: integer;
-    sName, sSurName, sPatronymic: string;
-    bDeleted: boolean;
-  end;
-
-  TCarModel = record
-    iID: integer;
-    sFirm, sModel: string;
-    bDeleted: boolean;
-  end;
-
-  TCarRec = record
-    iID: integer;
-    sNumber: string;
-    iCarModelID, iYear: integer;
-    tLastTO: TDate;
-    dPath: double;
-    bDeleted: boolean;
-  end;}
 
   TdmAutoPark = class(TDataModule)
     ADOConnection: TADOConnection;
@@ -69,21 +41,29 @@ type
     { Private declarations }
   public
     { Public declarations }
-    function GetData: boolean;
+    function GetAllData: boolean;
     function GetCarModels: boolean;
+    function GetCars: boolean;
+    function GetDrivers: boolean;
+    function GetLists: boolean;
+    function GetViewLists: boolean;
+    function GetDispatchers: boolean;
     function DoPathListData(aData: TDataRec): boolean;
     function DoCarModelData(aData: TDataRec): boolean;
+    function DoCarData(aData: TDataRec): boolean;
+    function DoDriverData(aData: TDataRec): boolean;
+    function DoDispatcherData(aData: TDataRec): boolean;
   end;
 
 function GetDriverName(aID: integer; aShort: boolean = true): string;
-function GetDispName(aID: integer; aShort: boolean = true): string;
+function GetDispatcherName(aID: integer; aShort: boolean = true): string;
 function GetCarName(aID: integer; aShort: boolean = true): string;
 function GetCarModelName(aID: integer): string;
 
 var
   dmAutoPark: TdmAutoPark;
   PathLists, Drivers, Dispatchers, CarModels, Cars: array of TDataRec;
-  ListOrder: array of integer;
+  ViewLists: array of TViewRec;
 
 implementation
 
@@ -92,46 +72,57 @@ implementation
 {$R *.dfm}
 
 uses
-  System.DateUtils, Dialogs, System.UITypes;
+  System.DateUtils, Dialogs, System.UITypes, uCommon;
 
 function GetDriverName(aID: integer; aShort: boolean = true): string;
+var
+  i: integer;
 begin
   result:='???';
-  if (aID < 0) or (aID > High(Drivers)) then exit;
-  if aShort then result:=Drivers[aID].sdrSurName+' '+Copy(Drivers[aID].sdrName,1,1)
-          +'.'+Copy(Drivers[aID].sdrPatronymic,1,1)+'.'
-  else  result:=Drivers[aID].sdrSurName+' '+Drivers[aID].sdrName+' '+Drivers[aID].sdrPatronymic;
-
+  for i:=0 to High(Drivers) do if aID = Drivers[i].iID then begin
+    result:=Drivers[i].sdrSurName+' ';
+    if aShort then result:=result+Copy(Drivers[i].sdrName,1,1)
+          +'.'+Copy(Drivers[i].sdrPatronymic,1,1)+'.'
+    else  result:=result+Drivers[i].sdrName+' '+Drivers[i].sdrPatronymic;
+    break;
+  end;
 end;
 
-function GetDispName(aID: integer; aShort: boolean = true): string;
+function GetDispatcherName(aID: integer; aShort: boolean = true): string;
+var
+  i: integer;
 begin
   result:='???';
-  if (aID < 0) or (aID > High(Dispatchers)) then exit;
-  if aShort then result:=Dispatchers[aID].sdsSurName+' '+Copy(Dispatchers[aID].sdsName,1,1)
-          +'.'+Copy(Dispatchers[aID].sdsPatronymic,1,1)+'.'
-  else result:=Dispatchers[aID].sdsSurName+' '+Dispatchers[aID].sdsName
-          +' '+Dispatchers[aID].sdsPatronymic;
+  for i:=0 to High(Dispatchers) do if aID = Dispatchers[i].iID then begin
+    result:=Dispatchers[i].sdsSurName+' ';
+    if aShort then result:=result+Copy(Dispatchers[i].sdsName,1,1)
+          +'.'+Copy(Dispatchers[i].sdsPatronymic,1,1)+'.'
+    else result:=result+Dispatchers[i].sdsName+' '+Dispatchers[i].sdsPatronymic;
+    break;
+  end;
 end;
 
 function GetCarName(aID: integer; aShort: boolean = true): string;
 var
-  k: integer;
+  i: integer;
 begin
   result:='???';
-  if (aID < 0) or (aID > High(Cars)) then exit;
-  k:=Cars[aID].iCarModelID;
-  result:=Cars[aID].sNumber;
-  if not aShort then result:=CarModels[k].sFirm+' '+CarModels[k].sModel+' '+result;
+  for i:=0 to High(Cars) do if aID = Cars[i].iID then begin
+    result:=Cars[i].sNumber;
+    if not aShort then result:=GetCarModelName(Cars[i].iCarModelID)+' '+result;
+    break;
+  end;
 end;
 
 function GetCarModelName(aID: integer): string;
 var
-  k: integer;
+  i: integer;
 begin
   result:='???';
-  if (aID < 0) or (aID > High(CarModels)) then exit;
-  result:=CarModels[aID].sFirm+' '+CarModels[aID].sModel;
+  for i:=0 to High(CarModels) do if aID = CarModels[i].iID then begin
+    result:=CarModels[i].sFirm+' '+CarModels[i].sModel;
+    break;
+  end;
 end;
 
 function TdmAutoPark.GetCarModels: boolean;
@@ -139,6 +130,7 @@ var
   i: integer;
   s: string;
 begin
+  result:=false;
   s:='SELECT * FROM carmodels';
   with ADOQuery do begin
     Active:=false;
@@ -148,11 +140,15 @@ try
     Active:=true;
     SetLength(CarModels,RecordCount);
     First;
-    for i:=0 to High(CarModels) do begin
-      CarModels[i].iID:=FieldByName('id').AsInteger;
-      CarModels[i].sFirm:=FieldByName('firm').AsString;
-      CarModels[i].sModel:=FieldByName('model').AsString;
-      CarModels[i].bDeleted:=FieldByName('deleted').AsInteger > 0;
+    for i:=0 to High(CarModels) do with CarModels[i] do begin
+      iID:=FieldByName('id').AsInteger;
+      if iID <> (i+1) then begin
+        MessageDlg('Таблица моделей автомобилей повреждена',mtError,[mbOk],0);
+        exit;
+      end;
+      sFirm:=FieldByName('firm').AsString;
+      sModel:=FieldByName('model').AsString;
+      bDeleted:=FieldByName('deleted').AsInteger > 0;
       Next;
     end;
 except
@@ -162,140 +158,491 @@ except
     end;
 end;
   end;
-end;
-
-function TdmAutoPark.GetData: boolean;
-var
-  i: integer;
-begin
-  GetCarModels;
-  SetLength(PathLists,10);
-  SetLength(Drivers,2);
-  SetLength(Dispatchers,2);
-  SetLength(Cars,2);
-  SetLength(ListOrder,Length(PathLists));
-  for i:=0 to High(ListOrder) do ListOrder[i]:=i;
-
-  with Drivers[0] do begin
-    sdrSurName:='Кормухин';
-    sdrName:='Сергей';
-    sdrPatronymic:='Васильевич';
-    tBirthDate:=EncodeDate(2001,7,16);
-    bDeleted:=false;
-  end;
-  with Drivers[1] do begin
-    sdrSurName:='Васильков';
-    sdrName:='Иван';
-    sdrPatronymic:='Петрович';
-    tBirthDate:=EncodeDate(1996,3,6);
-    bDeleted:=false;
-  end;
-
-  with Dispatchers[0] do begin
-    sdsSurName:='Василевская';
-    sdsName:='Варвара';
-    sdsPatronymic:='Степановна';
-    bDeleted:=false;
-  end;
-  with Dispatchers[1] do begin
-    sdsSurName:='Петрушевский';
-    sdsName:='Максим';
-    sdsPatronymic:='Сергеевич';
-    bDeleted:=false;
-  end;
-
-  with Cars[0] do begin
-    sNumber:='A123TC196';
-    iCarModelID:=0;
-    iYear:=2021;
-    tLastTO:=EncodeDate(2023,1,10);
-    dcPath:=22345.8;
-    bDeleted:=false;
-  end;
-  with Cars[1] do begin
-    sNumber:='K548PM96';
-    iCarModelID:=1;
-    iYear:=2020;
-    tLastTO:=EncodeDate(2023,1,17);
-    dcPath:=43565.6;
-    bDeleted:=false;
-  end;
-
-  with PathLists[0] do begin
-    tTimeIn:=EncodeDateTime(2023,2,10,6,11,0,0);
-    tTimeOut:=EncodeDateTime(2023,2,10,13,45,0,0);
-    iDriverID:=0;
-    iCarID:=0;
-    iDispID:=0;
-    dFuel:=18.3;
-    dlPath:=200.6;
-    bDeleted:=true;
-  end;
-  with PathLists[1] do begin
-    tTimeIn:=EncodeDateTime(2023,2,10,9,15,0,0);
-    tTimeOut:=EncodeDateTime(2023,2,10,19,28,0,0);
-    iDriverID:=1;
-    iCarID:=1;
-    iDispID:=1;
-    dFuel:=36.3;
-    dlPath:=400.9;
-    bDeleted:=false;
-  end;
-  with PathLists[2] do begin
-    tTimeIn:=EncodeDateTime(2023,2,15,9,15,0,0);
-    tTimeOut:=EncodeDateTime(2023,2,15,19,28,0,0);
-    iDriverID:=0;
-    iCarID:=0;
-    iDispID:=0;
-    dFuel:=56.3;
-    dlPath:=650.9;
-    bDeleted:=false;
-  end;
-  with PathLists[3] do begin
-    tTimeIn:=EncodeDateTime(2023,2,16,9,15,0,0);
-    tTimeOut:=EncodeDateTime(2023,2,16,19,28,0,0);
-    iDriverID:=1;
-    iCarID:=1;
-    iDispID:=1;
-    dFuel:=21.3;
-    dlPath:=280.9;
-    bDeleted:=false;
-  end;
-  with PathLists[4] do begin
-    tTimeIn:=EncodeDateTime(2023,2,17,9,15,0,0);
-    tTimeOut:=EncodeDateTime(2023,2,17,19,28,0,0);
-    iDriverID:=0;
-    iCarID:=0;
-    iDispID:=0;
-    dFuel:=38.3;
-    dlPath:=350.9;
-    bDeleted:=false;
-  end;
-  PathLists[5]:=PathLists[0];
-  PathLists[6]:=PathLists[1];
-  PathLists[7]:=PathLists[2];
-  PathLists[8]:=PathLists[3];
-  PathLists[9]:=PathLists[4];
   result:=true;
 end;
 
-function TdmAutoPark.DoCarModelData(aData: TDataRec): boolean;
+function TdmAutoPark.GetCars: boolean;
 var
   i: integer;
   s: string;
 begin
   result:=false;
+  s:='SELECT * FROM cars';
+  with ADOQuery do begin
+    Active:=false;
+    SQL.Clear;
+    SQL.Add(s);
+try
+    Active:=true;
+    SetLength(Cars,RecordCount);
+    First;
+    for i:=0 to High(Cars) do with Cars[i] do begin
+      iID:=FieldByName('id').AsInteger;
+      if iID <> (i+1) then begin
+        MessageDlg('Таблица автомобилей повреждена',mtError,[mbOk],0);
+        exit;
+      end;
+      sNumber:=FieldByName('number').AsString;
+      iCarModelID:=FieldByName('model_id').AsInteger;
+      iYear:=FieldByName('year').AsInteger;
+      tLastTO:=FieldByName('last_to').AsDateTime;
+      dCPath:=FieldByName('path').AsFloat;
+      bDeleted:=FieldByName('deleted').AsInteger > 0;
+      Next;
+    end;
+except
+    on E: Exception do begin
+      MessageDlg(E.Message,mtError,[mbOk],0);
+      exit;
+    end;
+end;
+  end;
+  result:=true;
+end;
+
+function TdmAutoPark.GetDrivers: boolean;
+var
+  i: integer;
+  s: string;
+begin
+  result:=false;
+  s:='SELECT * FROM drivers';
+  with ADOQuery do begin
+    Active:=false;
+    SQL.Clear;
+    SQL.Add(s);
+try
+    Active:=true;
+    SetLength(Drivers,RecordCount);
+    First;
+    for i:=0 to High(Drivers) do with Drivers[i] do begin
+      iID:=FieldByName('id').AsInteger;
+      if iID <> (i+1) then begin
+        MessageDlg('Таблица водителей повреждена',mtError,[mbOk],0);
+        exit;
+      end;
+      sdrName:=FieldByName('name').AsString;
+      sdrPatronymic:=FieldByName('patronymic').AsString;
+      sdrSurName:=FieldByName('surname').AsString;
+      tBirthDate:=FieldByName('birthdate').AsDateTime;
+      bDeleted:=FieldByName('deleted').AsInteger > 0;
+      Next;
+    end;
+except
+    on E: Exception do begin
+      MessageDlg(E.Message,mtError,[mbOk],0);
+      exit;
+    end;
+end;
+  end;
+  result:=true;
+end;
+
+function TdmAutoPark.GetLists: boolean;
+var
+  i: integer;
+  s: string;
+begin
+  result:=false;
+  s:='SELECT * FROM pathlists';
+  with ADOQuery do begin
+    Active:=false;
+    SQL.Clear;
+    SQL.Add(s);
+try
+    Active:=true;
+    SetLength(PathLists,RecordCount);
+    First;
+    for i:=0 to High(PathLists) do with PathLists[i] do begin
+      iID:=FieldByName('id').AsInteger;
+      if iID <> (i+1) then begin
+        MessageDlg('Таблица путевых листов повреждена',mtError,[mbOk],0);
+        exit;
+      end;
+      tTimeOut:=FieldByName('timeout').AsDateTime;
+      tTimeIn:=FieldByName('timein').AsDateTime;
+      iDriverID:=FieldByName('driver_id').AsInteger;
+      iCarID:=FieldByName('car_id').AsInteger;
+      iDispID:=FieldByName('disp_id').AsInteger;
+      dFuel:=FieldByName('fuel').AsFloat;
+      dlPath:=FieldByName('path').AsFloat;
+      bDeleted:=FieldByName('deleted').AsInteger > 0;
+      Next;
+    end;
+except
+    on E: Exception do begin
+      MessageDlg(E.Message,mtError,[mbOk],0);
+      exit;
+    end;
+end;
+  end;
+  result:=true;
+end;
+
+function TdmAutoPark.GetViewLists: boolean;
+var
+  i: integer;
+  s: string;
+begin
+  result:=false;
+  s:='SELECT pl.id as lnum, pl.timeout as ltimeout, pl.timein as ltimein,';
+  s:=s+' pl.fuel as lfuel, pl.path as lpath, pl.deleted as ldeleted,';
+  s:=s+' CONCAT(dr.surname,'' '',dr.name,'' '',dr.patronymic) as ldriver,';
+  s:=s+' CONCAT(ds.surname,'' '',ds.name,'' '',ds.patronymic) as ldisp,';
+  s:=s+' CONCAT(cr.number,'' '',cm.firm,'' '',cm.model) as lcar';
+  s:=s+' FROM pathlists pl';
+  s:=s+' JOIN drivers as dr on dr.id = pl.driver_id';
+  s:=s+' JOIN disps as ds on ds.id = pl.disp_id';
+  s:=s+' JOIN cars as cr on cr.id = pl.car_id';
+  s:=s+' JOIN carmodels as cm on cm.id = cr.model_id';
+  s:=s+' order by pl.id desc';
+  with ADOQuery do begin
+    Active:=false;
+    SQL.Clear;
+    SQL.Add(s);
+try
+    Active:=true;
+    SetLength(ViewLists,RecordCount);
+    First;
+    for i:=0 to High(ViewLists) do begin
+      ViewLists[i].iID:=FieldByName('lnum').AsInteger;
+      ViewLists[i].tTimeOut:=FieldByName('ltimeout').AsDateTime;
+      ViewLists[i].tTimeIn:=FieldByName('ltimein').AsDateTime;
+      ViewLists[i].sDriver:=FieldByName('ldriver').AsString;
+      ViewLists[i].sCar:=FieldByName('lcar').AsString;
+      ViewLists[i].sDispatcher:=FieldByName('ldisp').AsString;
+      ViewLists[i].dFuel:=FieldByName('lfuel').AsFloat;
+      ViewLists[i].dPath:=FieldByName('lpath').AsFloat;
+      ViewLists[i].bDeleted:=FieldByName('ldeleted').AsInteger > 0;
+      Next;
+    end;
+    Active:=false;
+except
+    on E: Exception do begin
+      Active:=false;
+      MessageDlg(E.Message,mtError,[mbOk],0);
+      exit;
+    end;
+end;
+  end;
+  result:=true;
+end;
+
+function TdmAutoPark.GetDispatchers: boolean;
+var
+  i: integer;
+  s: string;
+begin
+  result:=false;
+  s:='SELECT * FROM disps';
+  with ADOQuery do begin
+    Active:=false;
+    SQL.Clear;
+    SQL.Add(s);
+try
+    Active:=true;
+    SetLength(Dispatchers,RecordCount);
+    First;
+    for i:=0 to High(Dispatchers) do with Dispatchers[i] do begin
+      iID:=FieldByName('id').AsInteger;
+      if iID <> (i+1) then begin
+        MessageDlg('Таблица диспетчеров повреждена',mtError,[mbOk],0);
+        exit;
+      end;
+      sdsName:=FieldByName('name').AsString;
+      sdsPatronymic:=FieldByName('patronymic').AsString;
+      sdsSurName:=FieldByName('surname').AsString;
+      bDeleted:=FieldByName('deleted').AsInteger > 0;
+      Next;
+    end;
+except
+    on E: Exception do begin
+      MessageDlg(E.Message,mtError,[mbOk],0);
+      exit;
+    end;
+end;
+  result:=true;
+  end;
+end;
+
+function TdmAutoPark.GetAllData: boolean;
+var
+  bol: boolean;
+begin
+  result:=GetCarModels;
+  bol:=GetCars;
+  result:=result or bol;
+  bol:=GetDrivers;
+  result:=result or bol;
+  bol:=GetDispatchers;
+  result:=result or bol;
+  bol:=GetLists;
+  result:=result or bol;
+end;
+
+function TdmAutoPark.DoCarModelData(aData: TDataRec): boolean;
+var
+  i,k: integer;
+  s: string;
+  bol: boolean;
+begin
+  result:=false;
   if aData.iID < 0 then begin
-    s:='INSERT INTO carmodels (firm, model, deleted) VALUES(''';
-    s:=s+aData.sFirm+''',''';
-    s:=s+aData.sModel+''',';
+    s:='INSERT INTO carmodels (firm, model, deleted) VALUES(';
+    s:=s+''''+aData.sFirm+''',';
+    s:=s+''''+aData.sModel+''',';
     s:=s+'0);';
   end
   else begin
-    s:='UPDATE carmodels SET firm=''';
-    s:=s+aData.sFirm+''', model=''';
-    s:=s+aData.sModel+''', deleted=';
-    if aData.bDeleted then s:=s+'1' else s:=s+'0';
+    bol:=false;
+    for i:=0 to High(CarModels) do if CarModels[i].iID = aData.iID then begin
+      k:=i;
+      bol:=true;
+      break;
+    end;
+    if not bol then begin
+      MessageDlg('Запись не найдена'#13'Обратитесь к разработчику',mtError,[mbOk],0);
+      exit;
+    end;
+    bol:=false;
+    s:='UPDATE carmodels SET';
+    if aData.sFirm <> CarModels[k].sFirm then begin
+      s:=s+' firm='''+aData.sFirm+'''';
+      bol:=true;
+    end;
+    if aData.sModel <> CarModels[k].sModel then begin
+      if bol then s:=s+',';
+      s:=s+' model='''+aData.sModel+'''';
+      bol:=true;
+    end;
+    if aData.bDeleted <> CarModels[k].bDeleted then begin
+      if bol then s:=s+',';
+      if aData.bDeleted then s:=s+' deleted=1' else s:=s+' deleted=0';
+      bol:=true;
+    end;
+    if not bol then begin
+      result:=true;
+      exit;
+    end;
+    s:=s+' WHERE id='+IntToStr(aData.iID)+';';
+  end;
+  with ADOQuery do begin
+    SQL.Clear;
+    SQL.Add(s);
+try
+    i:=ExecSQL;
+except
+    on E: Exception do begin
+      MessageDlg(E.Message,mtError,[mbOk],0);
+      exit;
+    end;
+end;
+  result:=true;
+  end;
+end;
+
+function TdmAutoPark.DoDriverData(aData: TDataRec): boolean;
+var
+  i,k: integer;
+  s: string;
+  bol: boolean;
+begin
+  result:=false;
+  if aData.iID < 0 then begin
+    s:='INSERT INTO drivers (name, patronymic, surname, birthdate, deleted) VALUES(';
+    s:=s+''''+aData.sdrName+''',';
+    s:=s+''''+aData.sdrPatronymic+''',';
+    s:=s+''''+aData.sdrSurName+''',';
+    s:=s+''''+FormatDateTime('yyyy-mm-dd',aData.tBirthDate)+''',';
+    s:=s+'0);';
+  end
+  else begin
+    bol:=false;
+    for i:=0 to High(Drivers) do if Drivers[i].iID = aData.iID then begin
+      k:=i;
+      bol:=true;
+      break;
+    end;
+    if not bol then begin
+      MessageDlg('Запись не найдена'#13'Обратитесь к разработчику',mtError,[mbOk],0);
+      exit;
+    end;
+    bol:=false;
+    s:='UPDATE drivers SET';
+    if aData.sdrName <> Drivers[k].sdrName then begin
+      s:=s+' name='''+aData.sdrName+'''';
+      bol:=true;
+    end;
+    if aData.sdrPatronymic <> Drivers[k].sdrPatronymic then begin
+      if bol then s:=s+',';
+      s:=s+' patronymic='''+aData.sdrPatronymic+'''';
+      bol:=true;
+    end;
+    if aData.sdrSurName <> Drivers[k].sdrSurName then begin
+      if bol then s:=s+',';
+      s:=s+' surname='''+aData.sdrSurName+'''';
+      bol:=true;
+    end;
+    if aData.tBirthDate <> Drivers[k].tBirthDate then begin
+      if bol then s:=s+',';
+      s:=s+' birthdate='''+FormatDateTime('yyyy-mm-dd',aData.tBirthDate)+'''';
+      bol:=true;
+    end;
+    if aData.bDeleted <> Drivers[k].bDeleted then begin
+      if bol then s:=s+',';
+      if aData.bDeleted then s:=s+' deleted=1' else s:=s+' deleted=0';
+      bol:=true;
+    end;
+    if not bol then begin
+      result:=true;
+      exit;
+    end;
+    s:=s+' WHERE id='+IntToStr(aData.iID)+';';
+  end;
+  with ADOQuery do begin
+    SQL.Clear;
+    SQL.Add(s);
+try
+    i:=ExecSQL;
+except
+    on E: Exception do begin
+      MessageDlg(E.Message,mtError,[mbOk],0);
+      exit;
+    end;
+end;
+  result:=true;
+  end;
+end;
+
+function TdmAutoPark.DoDispatcherData(aData: TDataRec): boolean;
+var
+  i,k: integer;
+  s: string;
+  bol: boolean;
+begin
+  result:=false;
+  if aData.iID < 0 then begin
+    s:='INSERT INTO disps (name, patronymic, surname, deleted) VALUES(';
+    s:=s+''''+aData.sdsName+''',';
+    s:=s+''''+aData.sdsPatronymic+''',';
+    s:=s+''''+aData.sdsSurName+''',';
+    s:=s+'0);';
+  end
+  else begin
+    bol:=false;
+    for i:=0 to High(Dispatchers) do if Dispatchers[i].iID = aData.iID then begin
+      k:=i;
+      bol:=true;
+      break;
+    end;
+    if not bol then begin
+      MessageDlg('Запись не найдена'#13'Обратитесь к разработчику',mtError,[mbOk],0);
+      exit;
+    end;
+    bol:=false;
+    s:='UPDATE disps SET';
+    if aData.sdsName <> Dispatchers[k].sdsName then begin
+      s:=s+' name='''+aData.sdrName+'''';
+      bol:=true;
+    end;
+    if aData.sdsPatronymic <> Dispatchers[k].sdsPatronymic then begin
+      if bol then s:=s+',';
+      s:=s+' patronymic='''+aData.sdsPatronymic+'''';
+      bol:=true;
+    end;
+    if aData.sdsSurName <> Dispatchers[k].sdsSurName then begin
+      if bol then s:=s+',';
+      s:=s+' surname='''+aData.sdsSurName+'''';
+      bol:=true;
+    end;
+    if aData.bDeleted <> Dispatchers[k].bDeleted then begin
+      if bol then s:=s+',';
+      if aData.bDeleted then s:=s+' deleted=1' else s:=s+' deleted=0';
+      bol:=true;
+    end;
+    if not bol then begin
+      result:=true;
+      exit;
+    end;
+    s:=s+' WHERE id='+IntToStr(aData.iID)+';';
+  end;
+  with ADOQuery do begin
+    SQL.Clear;
+    SQL.Add(s);
+try
+    i:=ExecSQL;
+except
+    on E: Exception do begin
+      MessageDlg(E.Message,mtError,[mbOk],0);
+      exit;
+    end;
+end;
+  result:=true;
+  end;
+end;
+
+function TdmAutoPark.DoCarData(aData: TDataRec): boolean;
+var
+  i,k: integer;
+  s: string;
+  bol: boolean;
+begin
+  result:=false;
+  if aData.iID < 0 then begin
+    s:='INSERT INTO cars (number, model_id, year, last_to, path, deleted) VALUES(';
+    s:=s+''''+aData.sNumber+''',';
+    s:=s+IntToStr(aData.iCarModelID)+',';
+    s:=s+IntToStr(aData.iYear)+',';
+    s:=s+''''+FormatDateTime('yyyy-mm-dd',aData.tLastTO)+''',';
+    s:=s+''''+DblToStr(aData.dcPath)+''',';
+    s:=s+'0);';
+  end
+  else begin
+    bol:=false;
+    for i:=0 to High(Cars) do if Cars[i].iID = aData.iID then begin
+      k:=i;
+      bol:=true;
+      break;
+    end;
+    if not bol then begin
+      MessageDlg('Запись не найдена'#13'Обратитесь к разработчику',mtError,[mbOk],0);
+      exit;
+    end;
+    bol:=false;
+    s:='UPDATE cars SET';
+    if aData.sNumber <> Cars[k].sNumber then begin
+      s:=s+' number='''+aData.sNumber+'''';
+      bol:=true;
+    end;
+    if aData.iCarModelID <> Cars[k].iCarModelID then begin
+      if bol then s:=s+',';
+      s:=s+' model_id='+IntToStr(aData.iCarModelID);
+      bol:=true;
+    end;
+    if aData.iYear <> Cars[k].iYear then begin
+      if bol then s:=s+',';
+      s:=s+' year='+IntToStr(aData.iYear);
+      bol:=true;
+    end;
+    if aData.tLastTO <> Cars[k].tLastTO then begin
+      if bol then s:=s+',';
+      s:=s+' last_to='''+FormatDateTime('yyyy-mm-dd',aData.tLastTO)+'''';
+      bol:=true;
+    end;
+    if aData.dcPath <> Cars[k].dcPath then begin
+      if bol then s:=s+',';
+      s:=s+' path='''+DblToStr(aData.dcPath)+'''';
+      bol:=true;
+    end;
+    if aData.bDeleted <> Cars[k].bDeleted then begin
+      if bol then s:=s+',';
+      if aData.bDeleted then s:=s+' deleted=1' else s:=s+' deleted=0';
+      bol:=true;
+    end;
+    if not bol then begin
+      result:=true;
+      exit;
+    end;
     s:=s+' WHERE id='+IntToStr(aData.iID)+';';
   end;
   with ADOQuery do begin
@@ -315,53 +662,93 @@ end;
 
 function TdmAutoPark.DoPathListData(aData: TDataRec): boolean;
 var
-  i: integer;
+  i,k: integer;
   s: string;
+  bol: boolean;
 begin
   result:=false;
-  with aData do begin
-    if (tTimeOut > 0) and (tTimeOut < Now) then begin
-      MessageDlg('Нельзя оформить путевку в прошлое',mtError,[mbOk],0);
+  if aData.iID < 0 then begin
+    s:='INSERT INTO pathlists (timeout, timein, driver_id, car_id, disp_id, fuel, path, deleted) VALUES(';
+    s:=s+''''+FormatDateTime('yyyy-mm-dd hh:nn:ss',aData.tTimeIn)+''',';
+    s:=s+''''+FormatDateTime('yyyy-mm-dd hh:nn:ss',aData.tTimeOut)+''',';
+    s:=s+IntToStr(aData.iDriverID)+',';
+    s:=s+IntToStr(aData.iCarID)+',';
+    s:=s+IntToStr(aData.iDispID)+',';
+    s:=s+''''+DblToStr(aData.dFuel)+''',';
+    s:=s+''''+DblToStr(aData.dlPath)+''',';
+    s:=s+'0);';
+  end
+  else begin
+    bol:=false;
+    for i:=0 to High(PathLists) do if PathLists[i].iID = aData.iID then begin
+      k:=i;
+      bol:=true;
+      break;
+    end;
+    if not bol then begin
+      MessageDlg('Запись не найдена'#13'Обратитесь к разработчику',mtError,[mbOk],0);
       exit;
     end;
-    if (tTimeIn > 0) and ((tTimeIn-tTimeOut) < 1/24/6) then begin
-      MessageDlg('Поездка не может быть короче 10 минут',mtError,[mbOk],0);
+    bol:=false;
+    s:='UPDATE pathlists SET';
+    if aData.tTimeOut <> PathLists[k].tTimeOut then begin
+      s:=s+' timeout='''+FormatDateTime('yyyy-mm-dd hh:nn:ss',aData.tTimeOut)+'''';
+      bol:=true;
+    end;
+    if aData.tTimeIn <> PathLists[k].tTimeIn then begin
+      if bol then s:=s+',';
+      s:=s+' timein='''+FormatDateTime('yyyy-mm-dd hh:nn:ss',aData.tTimeIn)+'''';
+      bol:=true;
+    end;
+    if aData.iDriverID <> PathLists[k].iDriverID then begin
+      if bol then s:=s+',';
+      s:=s+' driver_id='+IntToStr(aData.iDriverID);
+      bol:=true;
+    end;
+    if aData.iCarID <> PathLists[k].iCarID then begin
+      if bol then s:=s+',';
+      s:=s+' car_id='+IntToStr(aData.iCarID);
+      bol:=true;
+    end;
+    if aData.iDispID <> PathLists[k].iDispID then begin
+      if bol then s:=s+',';
+      s:=s+' disp_id='+IntToStr(aData.iDispID);
+      bol:=true;
+    end;
+    if aData.dFuel <> PathLists[k].dFuel then begin
+      if bol then s:=s+',';
+      s:=s+' fuel='''+DblToStr(aData.dFuel)+'''';
+      bol:=true;
+    end;
+    if aData.dlPath <> PathLists[k].dlPath then begin
+      if bol then s:=s+',';
+      s:=s+' path='''+DblToStr(aData.dlPath)+'''';
+      bol:=true;
+    end;
+    if aData.bDeleted <> Cars[k].bDeleted then begin
+      if bol then s:=s+',';
+      if aData.bDeleted then s:=s+' deleted=1' else s:=s+' deleted=0';
+      bol:=true;
+    end;
+    if not bol then begin
+      result:=true;
       exit;
     end;
-    if (iDriverID < 0) or (iDriverId > High(Drivers)) then begin
-      MessageDlg('Неправильно указан водитель',mtError,[mbOk],0);
-      exit;
-    end;
-    if Drivers[iDriverID].bDeleted then begin
-      MessageDlg('Указан удаленный водитель',mtError,[mbOk],0);
-      exit;
-    end;
-    if (iCarID < 0) or (iCarID > High(Cars)) then begin
-      MessageDlg('Неправильно указан автомобиль',mtError,[mbOk],0);
-      exit;
-    end;
-    if Cars[iCarID].bDeleted then begin
-      MessageDlg('Указан удаленный автомобиль',mtError,[mbOk],0);
-      exit;
-    end;
-    if (iDispID < 0) or (iDispID > High(Dispatchers)) then begin
-      MessageDlg('Неправильно указан диспетчер',mtError,[mbOk],0);
-      exit;
-    end;
-    if Dispatchers[iDispID].bDeleted then begin
-      MessageDlg('Указан удаленный диспетчер',mtError,[mbOk],0);
-      exit;
-    end;
-    if dFuel < 0 then begin
-      MessageDlg('Указан отрицательный расход топлива',mtError,[mbOk],0);
-      exit;
-    end;
-    if dlPath < 0 then begin
-      MessageDlg('Указан отрицательный пробег',mtError,[mbOk],0);
-      exit;
-    end;
+    s:=s+' WHERE id='+IntToStr(aData.iID)+';';
   end;
-
+  with ADOQuery do begin
+    SQL.Clear;
+    SQL.Add(s);
+try
+    i:=ExecSQL;
+except
+    on E: Exception do begin
+      MessageDlg(E.Message,mtError,[mbOk],0);
+      exit;
+    end;
+end;
+  result:=true;
+  end;
 end;
 
 end.

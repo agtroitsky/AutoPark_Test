@@ -3,6 +3,7 @@ unit uCommon;
 interface
 
 function floatBoolValidation(s: string; var d: double): boolean;
+function DblToStr(d: double): string;
 
 implementation
 
@@ -26,5 +27,11 @@ begin
   end;
 end;
 
+function DblToStr(d: double): string;
+begin
+  result:=IntToStr(Round(Int(d)));
+  result:=result+'.';
+  result:=result+IntToStr(Round(Frac(d)*10));
+end;
 
 end.

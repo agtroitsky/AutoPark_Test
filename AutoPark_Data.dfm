@@ -9,6 +9,7 @@ object dmAutoPark: TdmAutoPark
       'User ID=root;Extended Properties="DRIVER={MySQL ODBC 8.0 ANSI Dr' +
       'iver};UID=root;PWD=12345678;DATABASE=auto_test;PORT=3306;COLUMN_' +
       'SIZE_S32=1;"'
+    LoginPrompt = False
     Left = 32
     Top = 24
   end
