@@ -25,33 +25,26 @@ object frmAutoParkMain: TfrmAutoParkMain
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 903
-    object SpeedButton1: TSpeedButton
-      Left = 232
-      Top = 13
-      Width = 23
-      Height = 22
-      OnClick = SpeedButton1Click
-    end
-    object cbShowDelete: TCheckBox
-      Left = 8
-      Top = 12
-      Width = 153
-      Height = 17
-      Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1091#1076#1072#1083#1077#1085#1085#1099#1077
-      Checked = True
-      State = cbChecked
-      TabOrder = 0
-    end
+    ExplicitTop = -6
     object btnNew: TButton
-      Left = 368
-      Top = 2
+      Left = 96
+      Top = 4
       Width = 81
       Height = 35
       Caption = #1053#1086#1074#1099#1081' '#1087#1091#1090#1077#1074#1086#1081' '#1083#1080#1089#1090
-      TabOrder = 1
+      TabOrder = 0
       WordWrap = True
       OnClick = btnNewClick
+    end
+    object btnView: TButton
+      Left = 248
+      Top = 4
+      Width = 81
+      Height = 35
+      Caption = #1042#1080#1076' '#1090#1072#1073#1083#1080#1094#1099
+      TabOrder = 1
+      WordWrap = True
+      OnClick = btnViewClick
     end
   end
   object sgPathLists: TStringGrid
@@ -67,8 +60,6 @@ object frmAutoParkMain: TfrmAutoParkMain
     TabOrder = 1
     OnDblClick = sgPathListsDblClick
     OnDrawCell = sgPathListsDrawCell
-    ExplicitWidth = 903
-    ExplicitHeight = 306
   end
   object MainMenu1: TMainMenu
     Left = 16

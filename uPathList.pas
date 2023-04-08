@@ -91,19 +91,17 @@ begin
     cbDisp.SetFocus;
     exit;
   end;
-  i:=Drivers[Integer(cbDriver.Items.Objects[cbDriver.ItemIndex])].iID;
-  i:=Dispatchers[Integer(cbDisp.Items.Objects[cbDisp.ItemIndex])].iID;
-  i:=Cars[Integer(cbCar.Items.Objects[cbCar.ItemIndex])].iID;
+  i:=Integer(cbDriver.Items.Objects[cbDriver.ItemIndex]);
   if Drivers[i].bDeleted then begin
     MessageDlg('”казан удаленный водитель',mtError,[mbOk],0);
     exit;
   end;
-  i:=Cars[Integer(cbCar.Items.Objects[cbCar.ItemIndex])].iID;
+  i:=Integer(cbCar.Items.Objects[cbCar.ItemIndex]);
   if Cars[i].bDeleted then begin
     MessageDlg('”казан удаленный автомобиль',mtError,[mbOk],0);
     exit;
   end;
-  i:=Dispatchers[Integer(cbDisp.Items.Objects[cbDisp.ItemIndex])].iID;
+  i:=Integer(cbDisp.Items.Objects[cbDisp.ItemIndex]);
   if Dispatchers[i].bDeleted then begin
     MessageDlg('”казан удаленный диспетчер',mtError,[mbOk],0);
     exit;
@@ -119,7 +117,7 @@ begin
       dpDateOut.SetFocus;
       exit;
     end;
-    if (dpDateOut.Date = dpDateIn.Date) and (tpTimeOut.Time < tpTimeIn.Time) then begin
+    if (dpDateOut.Date = dpDateIn.Date) and (tpTimeIn.Time < tpTimeOut.Time) then begin
       MessageDlg('¬рем€ возвращени€ раньше времени выезда',mtError,[mbOk],0);
       tpTimeOut.SetFocus;
       exit;

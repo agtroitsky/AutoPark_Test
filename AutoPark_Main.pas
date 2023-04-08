@@ -11,15 +11,14 @@ type
   TfrmAutoParkMain = class(TForm)
     Panel1: TPanel;
     sgPathLists: TStringGrid;
-    cbShowDelete: TCheckBox;
     btnNew: TButton;
-    SpeedButton1: TSpeedButton;
     MainMenu1: TMainMenu;
     N1: TMenuItem;
     miDrivers: TMenuItem;
     miDisps: TMenuItem;
     miCarModels: TMenuItem;
     miCars: TMenuItem;
+    btnView: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure sgPathListsDrawCell(Sender: TObject; ACol, ARow: Integer;
@@ -31,6 +30,7 @@ type
     procedure miCarModelsClick(Sender: TObject);
     procedure miCarsClick(Sender: TObject);
     procedure sgPathListsDblClick(Sender: TObject);
+    procedure btnViewClick(Sender: TObject);
   private
     { Private declarations }
     procedure GridUpdate;
@@ -45,7 +45,7 @@ implementation
 
 {$R *.dfm}
 
-uses AutoPark_Data, uPathList, uCar, uList;
+uses AutoPark_Data, uPathList, uCar, uList, uView;
 
 var
   lflag: boolean = true;
@@ -95,7 +95,7 @@ end;
 procedure TfrmAutoParkMain.btnNewClick(Sender: TObject);
 var
   i: integer;
-  aData: TDataRec;
+  aData, aCar: TDataRec;
 begin
   aData.iID:=-1;
   if not frmPathList.DoPathList(aData) then exit;
@@ -104,6 +104,9 @@ begin
   aData.iID:=i+1;
   SetLength(PathLists,i+1);
   PathLists[i]:=aData;
+  if aData.dlPath > 0 then begin
+    dmAutoPark.AddPathToCar(aData.iCarID,aData.dlPath)
+  end;
   GridUpdate;
 end;
 
@@ -111,12 +114,23 @@ procedure TfrmAutoParkMain.sgPathListsDblClick(Sender: TObject);
 var
   i: integer;
   aData: TDataRec;
+  d: double;
 begin
   i:=ViewLists[sgPathLists.Selection.Top-1].iID-1;
   aData:=PathLists[i];
   if not frmPathList.DoPathList(aData) then exit;
   if not dmAutoPark.DoPathListData(aData) then exit;
+  d:=aData.dlPath - PathLists[i].dlPath;
+  if d <> 0 then begin
+    dmAutoPark.AddPathToCar(aData.iCarID,d)
+  end;
   PathLists[i]:=aData;
+  GridUpdate;
+end;
+
+procedure TfrmAutoParkMain.btnViewClick(Sender: TObject);
+begin
+  if not frmView.DoView then exit;
   GridUpdate;
 end;
 

@@ -8,6 +8,21 @@ uses
 const
   lNumMax = 10;
   lStrMax = 40;
+
+  vSortNumber = 0;
+  vSortCar    = 1;
+  vSortDriver = 2;
+  vSortDisp   = 3;
+  vSortPath   = 4;
+  vSortFuel   = 5;
+  vSortTimeOut = 6;
+  vSortTimeIn = 7;
+
+  vSortUp1  = 0;
+  vSortDwn1 = 1;
+  vSortUp2  = 2;
+  vSortDwn2 = 3;
+
 type
   TDataRec = record
     iID: integer;
@@ -34,6 +49,10 @@ type
     tTimeIn, tTimeOut: TDateTime;
   end;
 
+  TViewStyleRec = record
+    iSort1, iSort2: integer;
+  end;
+
   TdmAutoPark = class(TDataModule)
     ADOConnection: TADOConnection;
     ADOQuery: TADOQuery;
@@ -53,6 +72,8 @@ type
     function DoCarData(aData: TDataRec): boolean;
     function DoDriverData(aData: TDataRec): boolean;
     function DoDispatcherData(aData: TDataRec): boolean;
+    function AddPathToCar(aCarID: integer; aPath: double): boolean;
+    procedure DoResetView;
   end;
 
 function GetDriverName(aID: integer; aShort: boolean = true): string;
@@ -64,6 +85,7 @@ var
   dmAutoPark: TdmAutoPark;
   PathLists, Drivers, Dispatchers, CarModels, Cars: array of TDataRec;
   ViewLists: array of TViewRec;
+  CurViewStyle: TViewStyleRec;
 
 implementation
 
@@ -122,6 +144,14 @@ begin
   for i:=0 to High(CarModels) do if aID = CarModels[i].iID then begin
     result:=CarModels[i].sFirm+' '+CarModels[i].sModel;
     break;
+  end;
+end;
+
+procedure TdmAutoPark.DoResetView;
+begin
+  with CurViewStyle do begin
+    iSort1:=0;
+    iSort2:=1;
   end;
 end;
 
@@ -289,13 +319,53 @@ begin
   s:=s+' pl.fuel as lfuel, pl.path as lpath, pl.deleted as ldeleted,';
   s:=s+' CONCAT(dr.surname,'' '',dr.name,'' '',dr.patronymic) as ldriver,';
   s:=s+' CONCAT(ds.surname,'' '',ds.name,'' '',ds.patronymic) as ldisp,';
-  s:=s+' CONCAT(cr.number,'' '',cm.firm,'' '',cm.model) as lcar';
+  s:=s+' CONCAT(cr.number,'' '',cm.firm,'' '',cm.model) as lcar,';
+  s:=s+' CONCAT(cm.firm,'' '',cm.model) as scar';
   s:=s+' FROM pathlists pl';
   s:=s+' JOIN drivers as dr on dr.id = pl.driver_id';
   s:=s+' JOIN disps as ds on ds.id = pl.disp_id';
   s:=s+' JOIN cars as cr on cr.id = pl.car_id';
   s:=s+' JOIN carmodels as cm on cm.id = cr.model_id';
-  s:=s+' order by pl.id desc';
+  case CurViewStyle.iSort1 of
+    vSortNumber: case CurViewStyle.iSort2 of
+      vSortUp1: s:=s+' order by pl.id';
+      vSortDwn1: s:=s+' order by pl.id desc';
+    end;
+    vSortCar: case CurViewStyle.iSort2 of
+      vSortUp1: s:=s+' order by cr.number';
+      vSortDwn1: s:=s+' order by cr.number desc';
+      vSortUp2: s:=s+' order by scar desc';
+      vSortDwn2: s:=s+' order by scar desc';
+    end;
+    vSortDriver: case CurViewStyle.iSort2 of
+      vSortUp1: s:=s+' order by dr.surname';
+      vSortDwn1: s:=s+' order by dr.surname desc';
+      vSortUp2: s:=s+' order by dr.name';
+      vSortDwn2: s:=s+' order by dr.name desc';
+    end;
+    vSortDisp: case CurViewStyle.iSort2 of
+      vSortUp1: s:=s+' order by ds.surname';
+      vSortDwn1: s:=s+' order by ds.surname desc';
+      vSortUp2: s:=s+' order by ds.name';
+      vSortDwn2: s:=s+' order by ds.name desc';
+    end;
+    vSortPath: case CurViewStyle.iSort2 of
+      vSortUp1: s:=s+' order by lpath';
+      vSortDwn1: s:=s+' order by lpath desc';
+    end;
+    vSortFuel: case CurViewStyle.iSort2 of
+      vSortUp1: s:=s+' order by lfuel';
+      vSortDwn1: s:=s+' order by lfuel desc';
+    end;
+    vSortTimeOut: case CurViewStyle.iSort2 of
+      vSortUp1: s:=s+' order by ltimeout';
+      vSortDwn1: s:=s+' order by ltimeout desc';
+    end;
+    vSortTimeIn: case CurViewStyle.iSort2 of
+      vSortUp1: s:=s+' order by ltimeout';
+      vSortDwn1: s:=s+' order by ltimeout desc';
+    end;
+  end;
   with ADOQuery do begin
     Active:=false;
     SQL.Clear;
@@ -581,6 +651,25 @@ end;
   end;
 end;
 
+function TdmAutoPark.AddPathToCar(aCarID: integer; aPath: double): boolean;
+var
+  i,k: integer;
+begin
+  result:=false;
+  k:=-1;
+  for i:=0 to High(Cars) do if aCarID = Cars[i].iID then begin
+    k:=i;
+    break;
+  end;
+  if k < 0 then begin
+    MessageDlg('При коррекции пробега автомобиль не найден'#13'Обратитесь к разработчику',mtError,[mbOk],0);
+    exit;
+  end;
+  Cars[k].dcPath:=Cars[k].dcPath+aPath;
+  if not DoCarData(Cars[k]) then exit;
+  result:=true;
+end;
+
 function TdmAutoPark.DoCarData(aData: TDataRec): boolean;
 var
   i,k: integer;
@@ -605,7 +694,7 @@ begin
       break;
     end;
     if not bol then begin
-      MessageDlg('Запись не найдена'#13'Обратитесь к разработчику',mtError,[mbOk],0);
+      MessageDlg('При сохранении автомобиль не найден'#13'Обратитесь к разработчику',mtError,[mbOk],0);
       exit;
     end;
     bol:=false;
@@ -686,7 +775,7 @@ begin
       break;
     end;
     if not bol then begin
-      MessageDlg('Запись не найдена'#13'Обратитесь к разработчику',mtError,[mbOk],0);
+      MessageDlg('При сохранении путевой лист не найден'#13'Обратитесь к разработчику',mtError,[mbOk],0);
       exit;
     end;
     bol:=false;
