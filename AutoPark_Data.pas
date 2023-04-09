@@ -23,6 +23,21 @@ const
   vSortUp2  = 2;
   vSortDwn2 = 3;
 
+  vSelectNumber      = 1;
+  vSelectTimeOut     = 2;
+  vSelectTimeIn      = 3;
+  vSelectCarNumValue = 4;
+  vSelectCarNumPart  = 5;
+  vSelectCarModValue = 6;
+  vSelectCarModPart  = 7;
+  vSelectCarYear     = 8;
+  vSelectDriverValue = 9;
+  vSelectDriverPart  = 10;
+  vSelectDispValue   = 11;
+  vSelectDispPart    = 12;
+  vSelectPath        = 13;
+  vSelectFuel        = 14;
+
 type
   TDataRec = record
     iID: integer;
@@ -51,6 +66,9 @@ type
 
   TViewStyleRec = record
     iSort1, iSort2: integer;
+    iSelect1, iFrom, iTo: integer;
+    sPart, sSelect2: ansistring;
+    dFrom, dTo: TDateTime;
   end;
 
   TdmAutoPark = class(TDataModule)
@@ -73,12 +91,11 @@ type
     function DoDriverData(aData: TDataRec): boolean;
     function DoDispatcherData(aData: TDataRec): boolean;
     function AddPathToCar(aCarID: integer; aPath: double): boolean;
-    procedure DoResetView;
   end;
 
-function GetDriverName(aID: integer; aShort: boolean = true): string;
-function GetDispatcherName(aID: integer; aShort: boolean = true): string;
-function GetCarName(aID: integer; aShort: boolean = true): string;
+function GetDriverName(aID: integer): string;
+function GetDispatcherName(aID: integer): string;
+function GetCarName(aID: integer): string;
 function GetCarModelName(aID: integer): string;
 
 var
@@ -96,42 +113,35 @@ implementation
 uses
   System.DateUtils, Dialogs, System.UITypes, uCommon;
 
-function GetDriverName(aID: integer; aShort: boolean = true): string;
+function GetDriverName(aID: integer): string;
 var
   i: integer;
 begin
   result:='???';
-  for i:=0 to High(Drivers) do if aID = Drivers[i].iID then begin
-    result:=Drivers[i].sdrSurName+' ';
-    if aShort then result:=result+Copy(Drivers[i].sdrName,1,1)
-          +'.'+Copy(Drivers[i].sdrPatronymic,1,1)+'.'
-    else  result:=result+Drivers[i].sdrName+' '+Drivers[i].sdrPatronymic;
+  for i:=0 to High(Drivers) do if aID = Drivers[i].iID then with Drivers[i] do begin
+    result:=sdrSurName+' '+sdrName+' '+sdrPatronymic;
     break;
   end;
 end;
 
-function GetDispatcherName(aID: integer; aShort: boolean = true): string;
+function GetDispatcherName(aID: integer): string;
 var
   i: integer;
 begin
   result:='???';
-  for i:=0 to High(Dispatchers) do if aID = Dispatchers[i].iID then begin
-    result:=Dispatchers[i].sdsSurName+' ';
-    if aShort then result:=result+Copy(Dispatchers[i].sdsName,1,1)
-          +'.'+Copy(Dispatchers[i].sdsPatronymic,1,1)+'.'
-    else result:=result+Dispatchers[i].sdsName+' '+Dispatchers[i].sdsPatronymic;
+  for i:=0 to High(Dispatchers) do if aID = Dispatchers[i].iID then with Dispatchers[i] do begin
+    result:=sdsSurName+' '+sdsName+' '+sdsPatronymic;
     break;
   end;
 end;
 
-function GetCarName(aID: integer; aShort: boolean = true): string;
+function GetCarName(aID: integer): string;
 var
   i: integer;
 begin
   result:='???';
-  for i:=0 to High(Cars) do if aID = Cars[i].iID then begin
-    result:=Cars[i].sNumber;
-    if not aShort then result:=GetCarModelName(Cars[i].iCarModelID)+' '+result;
+  for i:=0 to High(Cars) do if aID = Cars[i].iID then with Cars[i] do begin
+    result:=sNumber+' '+GetCarModelName(Cars[i].iCarModelID);
     break;
   end;
 end;
@@ -144,14 +154,6 @@ begin
   for i:=0 to High(CarModels) do if aID = CarModels[i].iID then begin
     result:=CarModels[i].sFirm+' '+CarModels[i].sModel;
     break;
-  end;
-end;
-
-procedure TdmAutoPark.DoResetView;
-begin
-  with CurViewStyle do begin
-    iSort1:=0;
-    iSort2:=1;
   end;
 end;
 
@@ -312,7 +314,7 @@ end;
 function TdmAutoPark.GetViewLists: boolean;
 var
   i: integer;
-  s: string;
+  s: ansistring;
 begin
   result:=false;
   s:='SELECT pl.id as lnum, pl.timeout as ltimeout, pl.timein as ltimein,';
@@ -326,6 +328,22 @@ begin
   s:=s+' JOIN disps as ds on ds.id = pl.disp_id';
   s:=s+' JOIN cars as cr on cr.id = pl.car_id';
   s:=s+' JOIN carmodels as cm on cm.id = cr.model_id';
+  case CurViewStyle.iSelect1 of
+    vSelectNumber: s:=s+' WHERE pl.id BETWEEN '+IntToStr(CurViewStyle.iFrom)+' AND '+IntToStr(CurViewStyle.iTo);
+    vSelectTimeOut:;
+    vSelectTimeIn:;
+    vSelectCarNumValue: s:=s+' WHERE cr.number = '''+CurViewStyle.sSelect2+'''';
+    vSelectCarNumPart:;
+    vSelectCarModValue:;
+    vSelectCarModPart:;
+    vSelectCarYear: s:=s+' WHERE cr.year BETWEEN '+IntToStr(CurViewStyle.iFrom)+' AND '+IntToStr(CurViewStyle.iTo);
+    vSelectDriverValue:;
+    vSelectDriverPart:;
+    vSelectDispValue:;
+    vSelectDispPart:;
+    vSelectPath: s:=s+' WHERE pl.path BETWEEN '+IntToStr(CurViewStyle.iFrom)+' AND '+IntToStr(CurViewStyle.iTo);
+    vSelectFuel: s:=s+' WHERE pl.fuel BETWEEN '+IntToStr(CurViewStyle.iFrom)+' AND '+IntToStr(CurViewStyle.iTo);
+  end;
   case CurViewStyle.iSort1 of
     vSortNumber: case CurViewStyle.iSort2 of
       vSortUp1: s:=s+' order by pl.id';
@@ -334,7 +352,7 @@ begin
     vSortCar: case CurViewStyle.iSort2 of
       vSortUp1: s:=s+' order by cr.number';
       vSortDwn1: s:=s+' order by cr.number desc';
-      vSortUp2: s:=s+' order by scar desc';
+      vSortUp2: s:=s+' order by scar';
       vSortDwn2: s:=s+' order by scar desc';
     end;
     vSortDriver: case CurViewStyle.iSort2 of

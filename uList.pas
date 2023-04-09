@@ -64,7 +64,7 @@ begin
       SetLength(Cars,i+1);
       Cars[i]:=aData;
       sgList.RowCount:=i+1;
-      sgList.Cells[0,i]:=GetCarName(Cars[i].iID,false);
+      sgList.Cells[0,i]:=GetCarName(Cars[i].iID);
     end;
     stDriver: begin
       if not frmPers.DoDriver(aData) then exit;
@@ -74,7 +74,7 @@ begin
       SetLength(Drivers,i+1);
       Drivers[i]:=aData;
       sgList.RowCount:=i+1;
-      sgList.Cells[0,i]:=GetDriverName(Drivers[i].iID,false);
+      sgList.Cells[0,i]:=GetDriverName(Drivers[i].iID);
     end;
     stDispatcher: begin
       if not frmPers.DoDispatcher(aData) then exit;
@@ -84,7 +84,7 @@ begin
       SetLength(Dispatchers,i+1);
       Dispatchers[i]:=aData;
       sgList.RowCount:=i+1;
-      sgList.Cells[0,i]:=GetDispatcherName(Dispatchers[i].iID,false);
+      sgList.Cells[0,i]:=GetDispatcherName(Dispatchers[i].iID);
     end;
   end;
 end;
@@ -98,12 +98,12 @@ begin
     stDriver: begin
       Caption:='Водители';
       sgList.RowCount:=Length(Drivers);
-      for i:=0 to High(Drivers) do sgList.Cells[0,i]:=GetDriverName(Drivers[i].iID,false);
+      for i:=0 to High(Drivers) do sgList.Cells[0,i]:=GetDriverName(Drivers[i].iID);
     end;
     stDispatcher: begin
       Caption:='Диспетчеры';
       sgList.RowCount:=Length(Dispatchers);
-      for i:=0 to High(Dispatchers) do sgList.Cells[0,i]:=GetDispatcherName(Dispatchers[i].iID,false);
+      for i:=0 to High(Dispatchers) do sgList.Cells[0,i]:=GetDispatcherName(Dispatchers[i].iID);
     end;
     stCarModel: begin
       Caption:='Модели автомобилей';
@@ -113,7 +113,7 @@ begin
     stCar: begin
       Caption:='Автомобили';
       sgList.RowCount:=Length(Cars);
-      for i:=0 to High(Cars) do sgList.Cells[0,i]:=GetCarName(Cars[i].iID,false);
+      for i:=0 to High(Cars) do sgList.Cells[0,i]:=GetCarName(Cars[i].iID);
     end;
     else begin
       MessageDlg('Неизвестный стиль'#13'Обратитесь к разработчику',mtError,[mbOk],0);
@@ -149,21 +149,21 @@ begin
       if not frmCar.DoCar(aData) then exit;
       if not dmAutoPark.DoCarData(aData) then exit;
       Cars[i]:=aData;
-      sgList.Cells[0,i]:=GetCarName(Cars[i].iID,false);
+      sgList.Cells[0,i]:=GetCarName(Cars[i].iID);
     end;
     stDriver: begin
       aData:=Drivers[i];
       if not frmPers.DoDriver(aData) then exit;
       if not dmAutoPark.DoDriverData(aData) then exit;
       Drivers[i]:=aData;
-      sgList.Cells[0,i]:=GetDriverName(Drivers[i].iID,false);
+      sgList.Cells[0,i]:=GetDriverName(Drivers[i].iID);
     end;
     stDispatcher: begin
       aData:=Dispatchers[i];
       if not frmPers.DoDispatcher(aData) then exit;
       if not dmAutoPark.DoDispatcherData(aData) then exit;
       Dispatchers[i]:=aData;
-      sgList.Cells[0,i]:=GetDispatcherName(Dispatchers[i].iID,false);
+      sgList.Cells[0,i]:=GetDispatcherName(Dispatchers[i].iID);
     end;
   end;
 end;

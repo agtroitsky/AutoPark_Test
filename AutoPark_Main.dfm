@@ -25,7 +25,6 @@ object frmAutoParkMain: TfrmAutoParkMain
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitTop = -6
     object btnNew: TButton
       Left = 96
       Top = 4

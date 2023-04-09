@@ -139,6 +139,7 @@ begin
   if not lflag then exit;
   lflag:=false;
   if not dmAutoPark.GetAllData then exit;
+  frmView.DoResetView;
   GridUpdate;
 end;
 

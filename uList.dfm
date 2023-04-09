@@ -23,8 +23,6 @@ object frmList: TfrmList
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitTop = -6
-    ExplicitWidth = 269
     object btnCreate: TButton
       Left = 88
       Top = 10
@@ -49,7 +47,6 @@ object frmList: TfrmList
     TabOrder = 1
     OnDblClick = sgListDblClick
     OnDrawCell = sgListDrawCell
-    ExplicitTop = 38
     ColWidths = (
       253)
   end

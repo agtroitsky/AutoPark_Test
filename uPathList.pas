@@ -148,13 +148,13 @@ begin
   if aData.iID < 0 then begin
     cbDriver.Items.Clear;
     for i:=0 to High(Drivers) do if not Drivers[i].bDeleted then
-      cbDriver.Items.AddObject(GetDriverName(Drivers[i].iID,false),TObject(i));
+      cbDriver.Items.AddObject(GetDriverName(Drivers[i].iID),TObject(i));
     cbDisp.Items.Clear;
     for i:=0 to High(Dispatchers) do if not Dispatchers[i].bDeleted then
-        cbDisp.Items.AddObject(GetDispatcherName(Dispatchers[i].iID,false),TObject(i));
+        cbDisp.Items.AddObject(GetDispatcherName(Dispatchers[i].iID),TObject(i));
     cbCar.Items.Clear;
     for i:=0 to High(Cars) do if not Cars[i].bDeleted then
-        cbCar.Items.AddObject(GetCarName(Cars[i].iID,false),TObject(i));
+        cbCar.Items.AddObject(GetCarName(Cars[i].iID),TObject(i));
     cbOut.Checked:=false;
     dpDateOut.Date:=Int(Now);
     tpTimeOut.Time:=Frac(Now);
@@ -168,16 +168,16 @@ begin
   else with aData do begin
     cbDriver.Items.Clear;
     for i:=0 to High(Drivers) do if not Drivers[i].bDeleted then
-      cbDriver.Items.AddObject(GetDriverName(Drivers[i].iID,false),TObject(i));
-    cbDriver.ItemIndex:=cbDriver.Items.IndexOf(GetDriverName(iDriverID,false));
+      cbDriver.Items.AddObject(GetDriverName(Drivers[i].iID),TObject(i));
+    cbDriver.ItemIndex:=cbDriver.Items.IndexOf(GetDriverName(iDriverID));
     cbDisp.Items.Clear;
     for i:=0 to High(Dispatchers) do if not Dispatchers[i].bDeleted then
-        cbDisp.Items.AddObject(GetDispatcherName(Dispatchers[i].iID,false),TObject(i));
-    cbDisp.ItemIndex:=cbDisp.Items.IndexOf(GetDispatcherName(iDispID,false));
+        cbDisp.Items.AddObject(GetDispatcherName(Dispatchers[i].iID),TObject(i));
+    cbDisp.ItemIndex:=cbDisp.Items.IndexOf(GetDispatcherName(iDispID));
     cbCar.Items.Clear;
     for i:=0 to High(Cars) do if not Cars[i].bDeleted then
-        cbCar.Items.AddObject(GetCarName(Cars[i].iID,false),TObject(i));
-    cbCar.ItemIndex:=cbCar.Items.IndexOf(GetCarName(iCarID,false));
+        cbCar.Items.AddObject(GetCarName(Cars[i].iID),TObject(i));
+    cbCar.ItemIndex:=cbCar.Items.IndexOf(GetCarName(iCarID));
     if tTimeIn = 0 then begin
       cbIn.Checked:=false;
       dpDateIn.Date:=Int(Now);
