@@ -130,6 +130,7 @@
             <Form>frmView</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uExport.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

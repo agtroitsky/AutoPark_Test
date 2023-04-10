@@ -13,7 +13,7 @@ type
     sgPathLists: TStringGrid;
     btnNew: TButton;
     MainMenu1: TMainMenu;
-    N1: TMenuItem;
+    miReferences: TMenuItem;
     miDrivers: TMenuItem;
     miDisps: TMenuItem;
     miCarModels: TMenuItem;
@@ -24,7 +24,6 @@ type
     procedure sgPathListsDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
     procedure btnNewClick(Sender: TObject);
-    procedure SpeedButton1Click(Sender: TObject);
     procedure miDriversClick(Sender: TObject);
     procedure miDispsClick(Sender: TObject);
     procedure miCarModelsClick(Sender: TObject);
@@ -45,7 +44,7 @@ implementation
 
 {$R *.dfm}
 
-uses AutoPark_Data, uPathList, uCar, uList, uView;
+uses AutoPark_Data, uPathList, uCar, uList, uView, uExport;
 
 var
   lflag: boolean = true;
@@ -163,6 +162,7 @@ begin
   Width:=n+53;
 end;
 
+// Своя отрисовка таблицы для выделения красным цветом удаленных элементов
 procedure TfrmAutoParkMain.sgPathListsDrawCell(Sender: TObject; ACol,
                     ARow: Integer; Rect: TRect; State: TGridDrawState);
 var
@@ -186,17 +186,6 @@ begin
     end;
     TextOut(Rect.Left+5,Rect.Top+5,s);
   end;
-end;
-
-procedure TfrmAutoParkMain.SpeedButton1Click(Sender: TObject);
-var
-  Car: TDataRec;
-begin
-  Car:=CarModels[0];
-  frmCar.ShowModal;
-exit;
-  Car.iID:=-1;
-  dmAutoPark.DoCarModelData(Car);
 end;
 
 end.

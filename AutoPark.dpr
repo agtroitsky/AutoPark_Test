@@ -10,7 +10,8 @@ uses
   uList in 'uList.pas' {frmList},
   uCarModel in 'uCarModel.pas' {frmCarModel},
   uPers in 'uPers.pas' {frmPers},
-  uView in 'uView.pas' {frmView};
+  uView in 'uView.pas' {frmView},
+  uExport in 'uExport.pas';
 
 {$R *.res}
 

@@ -24,6 +24,7 @@ type
     seFrom: TSpinEdit;
     seTo: TSpinEdit;
     edPart: TEdit;
+    cbShowDeleted: TCheckBox;
     procedure cbSort1Change(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure cbSelect1Change(Sender: TObject);
@@ -48,12 +49,14 @@ begin
     iSort1:=0;
     iSort2:=1;
     iSelect1:=0;
+    bShowDeleted:=true;
   end;
   cbSort1.ItemIndex:=0;
   cbSort1Change(self);
   cbSort2.ItemIndex:=1;
   cbSelect1.ItemIndex:=0;
   cbSelect1Change(self);
+  cbShowDeleted.Checked:=true;
 end;
 
 procedure TfrmView.cbSelect1Change(Sender: TObject);

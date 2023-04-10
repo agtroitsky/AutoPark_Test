@@ -67,6 +67,7 @@ type
     iSelect1, iFrom, iTo: integer;
     sPart, sSelect2: ansistring;
     dFrom, dTo: TDateTime;
+    bShowDeleted: boolean;
   end;
 
   TdmAutoPark = class(TDataModule)
@@ -80,7 +81,6 @@ type
     function GetCarModels: boolean;
     function GetCars: boolean;
     function GetDrivers: boolean;
-    function GetLists: boolean;
     function GetViewLists: boolean;
     function GetDispatchers: boolean;
     function DoPathListData(aData: TPathListRec): boolean;
@@ -93,6 +93,7 @@ type
 
 function GetDriverName(aID: integer): string;
 function GetDispatcherName(aID: integer): string;
+function GetCarNumber(aID: integer): string;
 function GetCarName(aID: integer): string;
 function GetCarModelName(aID: integer): string;
 
@@ -129,6 +130,17 @@ begin
   result:='???';
   for i:=0 to High(Dispatchers) do if aID = Dispatchers[i].iID then with Dispatchers[i] do begin
     result:=sdsSurName+' '+sdsName+' '+sdsPatronymic;
+    break;
+  end;
+end;
+
+function GetCarNumber(aID: integer): string;
+var
+  i: integer;
+begin
+  result:='???';
+  for i:=0 to High(Cars) do if aID = Cars[i].iID then begin
+    result:=Cars[i].sNumber;
     break;
   end;
 end;
@@ -267,48 +279,6 @@ end;
   end;
   result:=true;
 end;
-
-function TdmAutoPark.GetLists: boolean;
-var
-  i: integer;
-  s: string;
-begin
-  result:=false;
-  s:='SELECT * FROM pathlists';
-  with ADOQuery do begin
-    Active:=false;
-    SQL.Clear;
-    SQL.Add(s);
-try
-    Active:=true;
-    SetLength(PathLists,RecordCount);
-    First;
-    for i:=0 to High(PathLists) do with PathLists[i] do begin
-      iID:=FieldByName('id').AsInteger;
-      if iID <> (i+1) then begin
-        MessageDlg('Таблица путевых листов повреждена',mtError,[mbOk],0);
-        exit;
-      end;
-      tTimeOut:=FieldByName('timeout').AsDateTime;
-      tTimeIn:=FieldByName('timein').AsDateTime;
-      iDriverID:=FieldByName('driver_id').AsInteger;
-      iCarID:=FieldByName('car_id').AsInteger;
-      iDispID:=FieldByName('disp_id').AsInteger;
-      dFuel:=FieldByName('fuel').AsFloat;
-      dPath:=FieldByName('path').AsFloat;
-      bDeleted:=FieldByName('deleted').AsInteger > 0;
-      Next;
-    end;
-except
-    on E: Exception do begin
-      MessageDlg(E.Message,mtError,[mbOk],0);
-      exit;
-    end;
-end;
-  end;
-  result:=true;
-end;
-
 function TdmAutoPark.GetViewLists: boolean;
 var
   i: integer;
@@ -469,8 +439,6 @@ begin
   bol:=GetDrivers;
   result:=result or bol;
   bol:=GetDispatchers;
-  result:=result or bol;
-  bol:=GetLists;
   result:=result or bol;
 end;
 

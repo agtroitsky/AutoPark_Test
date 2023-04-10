@@ -63,7 +63,7 @@ object frmAutoParkMain: TfrmAutoParkMain
   object MainMenu1: TMainMenu
     Left = 16
     Top = 304
-    object N1: TMenuItem
+    object miReferences: TMenuItem
       Caption = #1057#1087#1088#1072#1074#1086#1095#1085#1080#1082#1080
       object miDrivers: TMenuItem
         Caption = #1042#1086#1076#1080#1090#1077#1083#1080

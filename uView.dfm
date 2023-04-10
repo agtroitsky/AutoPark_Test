@@ -3,7 +3,7 @@ object frmView: TfrmView
   Top = 0
   BorderStyle = bsDialog
   Caption = #1042#1080#1076' '#1090#1072#1073#1083#1080#1094#1099
-  ClientHeight = 254
+  ClientHeight = 282
   ClientWidth = 262
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,6 +15,9 @@ object frmView: TfrmView
   OldCreateOrder = False
   Position = poMainFormCenter
   OnKeyDown = FormKeyDown
+  DesignSize = (
+    262
+    282)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
@@ -57,7 +60,7 @@ object frmView: TfrmView
     Left = 8
     Top = 99
     Width = 241
-    Height = 86
+    Height = 110
     Caption = #1054#1090#1073#1086#1088
     TabOrder = 1
     object lbFrom: TLabel
@@ -152,12 +155,21 @@ object frmView: TfrmView
       Height = 21
       TabOrder = 6
     end
+    object cbShowDeleted: TCheckBox
+      Left = 52
+      Top = 82
+      Width = 137
+      Height = 17
+      Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1091#1076#1072#1083#1077#1085#1085#1099#1077
+      TabOrder = 7
+    end
   end
   object btnOk: TButton
     Left = 28
-    Top = 202
+    Top = 239
     Width = 86
     Height = 33
+    Anchors = [akLeft, akBottom]
     Caption = #1055#1088#1080#1084#1077#1085#1080#1090#1100
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -167,12 +179,14 @@ object frmView: TfrmView
     ModalResult = 1
     ParentFont = False
     TabOrder = 2
+    ExplicitTop = 202
   end
   object btnCancel: TButton
     Left = 158
-    Top = 206
+    Top = 243
     Width = 75
     Height = 25
+    Anchors = [akLeft, akBottom]
     Caption = #1054#1090#1084#1077#1085#1080#1090#1100
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
@@ -182,5 +196,6 @@ object frmView: TfrmView
     ModalResult = 2
     ParentFont = False
     TabOrder = 3
+    ExplicitTop = 206
   end
 end
