@@ -28,6 +28,7 @@ type
   private
     { Private declarations }
     fdPath: double;
+    iCurrentID: integer;
   public
     { Public declarations }
     function DoCar(var aData: TDataRec): boolean;
@@ -49,6 +50,7 @@ begin
   result:=false;
   if aData.iID < 0 then i:=Length(Cars)+1 else i:=aData.iID;
   Caption:='Автомобиль '+IntToStr(i);
+  iCurrentID:=aData.iID;
   if aData.iID < 0 then begin
     edNumber.Text:='';
     cbCarModel.Items.Clear;
@@ -83,6 +85,8 @@ begin
 end;
 
 procedure TfrmCar.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var
+  i: integer;
 begin
   CanClose:=true;
   if ModalResult <> mrOk then exit;
@@ -94,6 +98,11 @@ begin
   end;
   if Length(edNumber.Text) > lNumMax then begin
     MessageDlg('Номер должен быть не длинее '+IntToStr(lNumMax)+' символов',mtError,[mbOk],0);
+    edNumber.SetFocus;
+    exit;
+  end;
+  for i:=0 to High(Cars) do if (edNumber.Text = Cars[i].sNumber) and (Cars[i].iID <> iCurrentID) then begin
+    MessageDlg('Такой номер уже есть в системе',mtError,[mbOk],0);
     edNumber.SetFocus;
     exit;
   end;

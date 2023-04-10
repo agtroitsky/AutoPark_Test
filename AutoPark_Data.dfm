@@ -3,11 +3,6 @@ object dmAutoPark: TdmAutoPark
   Height = 175
   Width = 284
   object ADOConnection: TADOConnection
-    ConnectionString = 
-      'Provider=MSDASQL.1;Password=12345678;Persist Security Info=True;' +
-      'User ID=root;Extended Properties="DRIVER={MySQL ODBC 8.0 ANSI Dr' +
-      'iver};UID=root;PWD=12345678;DATABASE=auto_test;PORT=3306;COLUMN_' +
-      'SIZE_S32=1;"'
     LoginPrompt = False
     Provider = 'MSDASQL.1'
     Left = 32

@@ -19,6 +19,8 @@ type
     miCarModels: TMenuItem;
     miCars: TMenuItem;
     btnView: TButton;
+    btnExcel: TButton;
+    btnWord: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure sgPathListsDrawCell(Sender: TObject; ACol, ARow: Integer;
@@ -30,6 +32,8 @@ type
     procedure miCarsClick(Sender: TObject);
     procedure sgPathListsDblClick(Sender: TObject);
     procedure btnViewClick(Sender: TObject);
+    procedure btnExcelClick(Sender: TObject);
+    procedure btnWordClick(Sender: TObject);
   private
     { Private declarations }
     procedure GridUpdate;
@@ -44,7 +48,7 @@ implementation
 
 {$R *.dfm}
 
-uses AutoPark_Data, uPathList, uCar, uList, uView, uExport;
+uses AutoPark_Data, uPathList, uCar, uList, uView, uExport, IniFiles, uCommon;
 
 var
   lflag: boolean = true;
@@ -91,6 +95,16 @@ begin
   frmList.DoList(stDriver);
 end;
 
+procedure TfrmAutoParkMain.btnExcelClick(Sender: TObject);
+begin
+  ExportToExcel(PathLists[sgPathLists.Selection.Top-1].iID);
+end;
+
+procedure TfrmAutoParkMain.btnWordClick(Sender: TObject);
+begin
+  ExportToWord(PathLists[sgPathLists.Selection.Top-1].iID);
+end;
+
 procedure TfrmAutoParkMain.btnNewClick(Sender: TObject);
 var
   i: integer;
@@ -124,10 +138,53 @@ begin
   GridUpdate;
 end;
 
+// Инициализация приложения после создания всех форм и units
 procedure TfrmAutoParkMain.FormActivate(Sender: TObject);
+var
+  IniFile: TIniFile;
+  s: string;
 begin
   if not lflag then exit;
   lflag:=false;
+
+  IniFile:=TIniFile.Create(ExePath+IniName);
+  s:='Provider=MSDASQL.1;Persist Security Info=True;User ID=';
+  s:=s+IniFile.ReadString('Connect','User','')+';';
+  s:=s+'Password='+IniFile.ReadString('Connect','Password','')+';';
+  s:=s+'Extended Properties="Driver=MySQL ODBC 8.0 ANSI Driver;SERVER=';
+  s:=s+IniFile.ReadString('Connect','Server','')+';';
+  s:=s+'UID='+IniFile.ReadString('Connect','User','')+';';
+  s:=s+'PWD='+IniFile.ReadString('Connect','Password','')+';';
+  s:=s+'DATABASE='+IniFile.ReadString('Connect','Database','')+';';
+  s:=s+'PORT='+IniFile.ReadString('Connect','Port','')+'"';
+  dmAutoPark.ADOConnection.ConnectionString:=s;
+  with ExcelFields do begin
+    sFileIn:=IniFile.ReadString('Excel','FileIn','');
+    sFileOut:=IniFile.ReadString('Excel','FileOut','');
+    sfPathListNum:=IniFile.ReadString('Excel','PathListNum','');
+    sfDriver:=IniFile.ReadString('Excel','Driver','');
+    sfDispatcher:=IniFile.ReadString('Excel','Dispatcher','');
+    sfTimeIn:=IniFile.ReadString('Excel','TimeIn','');
+    sfTimeOut:=IniFile.ReadString('Excel','TimeOut','');
+    sfFuel:=IniFile.ReadString('Excel','Fuel','');
+    sfPath:=IniFile.ReadString('Excel','Path','');
+    sfCarModel:=IniFile.ReadString('Excel','CarModel','');
+    sfCarNumber:=IniFile.ReadString('Excel','CarNumber','');
+  end;
+  with WordFields do begin
+    sFileIn:=IniFile.ReadString('Word','FileIn','');
+    sFileOut:=IniFile.ReadString('Word','FileOut','');
+    sfPathListNum:=IniFile.ReadString('Word','PathListNum','');
+    sfDriver:=IniFile.ReadString('Word','Driver','');
+    sfDispatcher:=IniFile.ReadString('Word','Dispatcher','');
+    sfTimeIn:=IniFile.ReadString('Word','TimeIn','');
+    sfTimeOut:=IniFile.ReadString('Word','TimeOut','');
+    sfFuel:=IniFile.ReadString('Word','Fuel','');
+    sfPath:=IniFile.ReadString('Word','Path','');
+    sfCarModel:=IniFile.ReadString('Word','CarModel','');
+    sfCarNumber:=IniFile.ReadString('Word','CarNumber','');
+  end;
+  IniFile.Free;
   if not dmAutoPark.GetAllData then exit;
   frmView.DoResetView;
   GridUpdate;
@@ -160,6 +217,7 @@ begin
     for i:=0 to ColCount-1 do n:=n+ColWidths[i];
   end;
   Width:=n+53;
+  Caption:=Caption+'  '+GetMyVer;
 end;
 
 // Своя отрисовка таблицы для выделения красным цветом удаленных элементов

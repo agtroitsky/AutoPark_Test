@@ -252,6 +252,7 @@ begin
     dFrom:=dpFrom.Date;
     dTo:=dpTo.Date;
     sPart:=edPart.Text;
+    bShowDeleted:=cbShowDeleted.Checked;
   end;
   result:=true;
 end;

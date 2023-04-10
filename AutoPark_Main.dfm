@@ -25,6 +25,7 @@ object frmAutoParkMain: TfrmAutoParkMain
     Height = 41
     Align = alTop
     TabOrder = 0
+    ExplicitTop = -6
     object btnNew: TButton
       Left = 96
       Top = 4
@@ -36,7 +37,7 @@ object frmAutoParkMain: TfrmAutoParkMain
       OnClick = btnNewClick
     end
     object btnView: TButton
-      Left = 248
+      Left = 224
       Top = 4
       Width = 81
       Height = 35
@@ -44,6 +45,26 @@ object frmAutoParkMain: TfrmAutoParkMain
       TabOrder = 1
       WordWrap = True
       OnClick = btnViewClick
+    end
+    object btnExcel: TButton
+      Left = 352
+      Top = 4
+      Width = 81
+      Height = 35
+      Caption = #1069#1082#1089#1087#1086#1088#1090' '#1074' Excel'
+      TabOrder = 2
+      WordWrap = True
+      OnClick = btnExcelClick
+    end
+    object btnWord: TButton
+      Left = 480
+      Top = 4
+      Width = 81
+      Height = 35
+      Caption = #1069#1082#1089#1087#1086#1088#1090' '#1074' Word'
+      TabOrder = 3
+      WordWrap = True
+      OnClick = btnWordClick
     end
   end
   object sgPathLists: TStringGrid

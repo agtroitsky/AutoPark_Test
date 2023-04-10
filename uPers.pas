@@ -25,7 +25,7 @@ type
     procedure FormShow(Sender: TObject);
   private
     { Private declarations }
-    fdPath: double;
+    iCurrentID, iMode: integer;
   public
     { Public declarations }
     function DoDriver(var aData: TDataRec): boolean;
@@ -41,6 +41,10 @@ implementation
 
 uses uCommon;
 
+const
+  ModeDriver = 1;
+  ModeDispatcher = 2;
+
 function TfrmPers.DoDriver(var aData: TDataRec): boolean;
 var
   i: integer;
@@ -48,6 +52,8 @@ begin
   result:=false;
   dpBirthDate.Visible:=true;
   Label4.Visible:=true;
+  iCurrentID:=aData.iID;
+  iMode:=ModeDriver;
   if aData.iID < 0 then i:=Length(Drivers)+1 else i:=aData.iID;
   Caption:='Водитель '+IntToStr(i);
   if aData.iID < 0 then begin
@@ -83,6 +89,8 @@ begin
   dpBirthDate.Visible:=false;
   Label4.Visible:=false;
   result:=false;
+  iCurrentID:=aData.iID;
+  iMode:=ModeDispatcher;
   if aData.iID < 0 then i:=Length(Drivers)+1 else i:=aData.iID;
   Caption:='Диспетчер '+IntToStr(i);
   if aData.iID < 0 then begin
@@ -109,6 +117,9 @@ begin
 end;
 
 procedure TfrmPers.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var
+  i: integer;
+  s:string;
 begin
   CanClose:=true;
   if ModalResult <> mrOk then exit;
@@ -138,6 +149,22 @@ begin
     edSurName.SetFocus;
     exit;
   end;
+  s:=edSurName.Text+' '+edName.Text+' '+edPatronymic.Text;
+  if iMode = ModeDriver then begin
+    for i:=0 to High(Drivers) do if (GetDriverName(Drivers[i].iID) = s) and (Drivers[i].iID <> iCurrentID) then begin
+      MessageDlg('Такое сочетание ФИО уже есть в системе',mtError,[mbOk],0);
+      edName.SetFocus;
+      exit;
+    end;
+  end
+  else begin
+    for i:=0 to High(Dispatchers) do if (GetDispatcherName(Dispatchers[i].iID) = s) and (Dispatchers[i].iID <> iCurrentID) then begin
+      MessageDlg('Такое сочетание ФИО уже есть в системе',mtError,[mbOk],0);
+      edName.SetFocus;
+      exit;
+    end;
+  end;
+
   CanClose:=true;
 end;
 

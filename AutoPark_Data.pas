@@ -171,6 +171,7 @@ function TdmAutoPark.GetCarModels: boolean;
 var
   i: integer;
   s: string;
+  bDamaged: boolean;
 begin
   result:=false;
   s:='SELECT * FROM carmodels';
@@ -182,17 +183,16 @@ try
     Active:=true;
     SetLength(CarModels,RecordCount);
     First;
+    bDamaged:=false;
     for i:=0 to High(CarModels) do with CarModels[i] do begin
       iID:=FieldByName('id').AsInteger;
-      if iID <> (i+1) then begin
-        MessageDlg('Таблица моделей автомобилей повреждена',mtError,[mbOk],0);
-        exit;
-      end;
+      if iID <> (i+1) then Bdamaged:=true;
       sFirm:=FieldByName('firm').AsString;
       sModel:=FieldByName('model').AsString;
       bDeleted:=FieldByName('deleted').AsInteger > 0;
       Next;
     end;
+    if bDamaged then MessageDlg('Таблица моделей автомобилей повреждена',mtError,[mbOk],0);
 except
     on E: Exception do begin
       MessageDlg(E.Message,mtError,[mbOk],0);
@@ -207,6 +207,7 @@ function TdmAutoPark.GetCars: boolean;
 var
   i: integer;
   s: string;
+  bDamaged: boolean;
 begin
   result:=false;
   s:='SELECT * FROM cars';
@@ -218,12 +219,10 @@ try
     Active:=true;
     SetLength(Cars,RecordCount);
     First;
+    bDamaged:=false;
     for i:=0 to High(Cars) do with Cars[i] do begin
       iID:=FieldByName('id').AsInteger;
-      if iID <> (i+1) then begin
-        MessageDlg('Таблица автомобилей повреждена',mtError,[mbOk],0);
-        exit;
-      end;
+      if iID <> (i+1) then Bdamaged:=true;
       sNumber:=FieldByName('number').AsString;
       iCarModelID:=FieldByName('model_id').AsInteger;
       iYear:=FieldByName('year').AsInteger;
@@ -232,6 +231,7 @@ try
       bDeleted:=FieldByName('deleted').AsInteger > 0;
       Next;
     end;
+    if bDamaged then MessageDlg('Таблица автомобилей повреждена',mtError,[mbOk],0);
 except
     on E: Exception do begin
       MessageDlg(E.Message,mtError,[mbOk],0);
@@ -246,6 +246,7 @@ function TdmAutoPark.GetDrivers: boolean;
 var
   i: integer;
   s: string;
+  bDamaged: boolean;
 begin
   result:=false;
   s:='SELECT * FROM drivers';
@@ -257,12 +258,10 @@ try
     Active:=true;
     SetLength(Drivers,RecordCount);
     First;
+    bDamaged:=false;
     for i:=0 to High(Drivers) do with Drivers[i] do begin
       iID:=FieldByName('id').AsInteger;
-      if iID <> (i+1) then begin
-        MessageDlg('Таблица водителей повреждена',mtError,[mbOk],0);
-        exit;
-      end;
+      if iID <> (i+1) then Bdamaged:=true;
       sdrName:=FieldByName('name').AsString;
       sdrPatronymic:=FieldByName('patronymic').AsString;
       sdrSurName:=FieldByName('surname').AsString;
@@ -270,6 +269,7 @@ try
       bDeleted:=FieldByName('deleted').AsInteger > 0;
       Next;
     end;
+    if bDamaged then MessageDlg('Таблица водителей повреждена',mtError,[mbOk],0);
 except
     on E: Exception do begin
       MessageDlg(E.Message,mtError,[mbOk],0);
@@ -279,6 +279,44 @@ end;
   end;
   result:=true;
 end;
+
+function TdmAutoPark.GetDispatchers: boolean;
+var
+  i: integer;
+  s: string;
+  bDamaged: boolean;
+begin
+  result:=false;
+  s:='SELECT * FROM disps';
+  with ADOQuery do begin
+    Active:=false;
+    SQL.Clear;
+    SQL.Add(s);
+try
+    Active:=true;
+    SetLength(Dispatchers,RecordCount);
+    First;
+    bDamaged:=false;
+    for i:=0 to High(Dispatchers) do with Dispatchers[i] do begin
+      iID:=FieldByName('id').AsInteger;
+      if iID <> (i+1) then Bdamaged:=true;
+      sdsName:=FieldByName('name').AsString;
+      sdsPatronymic:=FieldByName('patronymic').AsString;
+      sdsSurName:=FieldByName('surname').AsString;
+      bDeleted:=FieldByName('deleted').AsInteger > 0;
+      Next;
+    end;
+    if bDamaged then MessageDlg('Таблица диспетчеров повреждена',mtError,[mbOk],0);
+except
+    on E: Exception do begin
+      MessageDlg(E.Message,mtError,[mbOk],0);
+      exit;
+    end;
+end;
+  result:=true;
+  end;
+end;
+
 function TdmAutoPark.GetViewLists: boolean;
 var
   i: integer;
@@ -297,6 +335,7 @@ begin
   s:=s+' JOIN disps as ds on ds.id = pl.disp_id';
   s:=s+' JOIN cars as cr on cr.id = pl.car_id';
   s:=s+' JOIN carmodels as cm on cm.id = cr.model_id';
+  if not CurViewStyle.bShowDeleted then s:=s+' AND pl.deleted = 0';
   case CurViewStyle.iSelect1 of
     vSelectNumber: s:=s+' WHERE pl.id BETWEEN '+IntToStr(CurViewStyle.iFrom)+' AND '+IntToStr(CurViewStyle.iTo);
     vSelectTimeOut: s:=s+' WHERE pl.timeout BETWEEN '''
@@ -390,43 +429,6 @@ except
 end;
   end;
   result:=true;
-end;
-
-function TdmAutoPark.GetDispatchers: boolean;
-var
-  i: integer;
-  s: string;
-begin
-  result:=false;
-  s:='SELECT * FROM disps';
-  with ADOQuery do begin
-    Active:=false;
-    SQL.Clear;
-    SQL.Add(s);
-try
-    Active:=true;
-    SetLength(Dispatchers,RecordCount);
-    First;
-    for i:=0 to High(Dispatchers) do with Dispatchers[i] do begin
-      iID:=FieldByName('id').AsInteger;
-      if iID <> (i+1) then begin
-        MessageDlg('Таблица диспетчеров повреждена',mtError,[mbOk],0);
-        exit;
-      end;
-      sdsName:=FieldByName('name').AsString;
-      sdsPatronymic:=FieldByName('patronymic').AsString;
-      sdsSurName:=FieldByName('surname').AsString;
-      bDeleted:=FieldByName('deleted').AsInteger > 0;
-      Next;
-    end;
-except
-    on E: Exception do begin
-      MessageDlg(E.Message,mtError,[mbOk],0);
-      exit;
-    end;
-end;
-  result:=true;
-  end;
 end;
 
 function TdmAutoPark.GetAllData: boolean;
