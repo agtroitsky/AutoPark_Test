@@ -11,9 +11,9 @@ COMMENT='Таблица диспетчеров';
 
 CREATE TABLE `drivers` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) CHARACTER SET cp1251 COLLATE cp1251_general_ci NOT NULL,
-  `patronymic` varchar(45) CHARACTER SET cp1251 COLLATE cp1251_general_ci NOT NULL,
-  `surname` varchar(45) CHARACTER SET cp1251 COLLATE cp1251_general_ci NOT NULL,
+  `name` varchar(45) NOT NULL,
+  `patronymic` varchar(45) NOT NULL,
+  `surname` varchar(45) NOT NULL,
   `birthdate` date NOT NULL,
   `deleted` tinyint(1) unsigned zerofill NOT NULL,
   PRIMARY KEY (`id`))

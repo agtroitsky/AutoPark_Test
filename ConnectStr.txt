@@ -1,6 +1,0 @@
-Provider=MSDASQL.1;Password=12345678;Persist Security Info=True;User ID=root;Extended Properties="DRIVER={MySQL ODBC 8.0 ANSI Driver};UID=root;PWD=12345678;DATABASE=auto_test;PORT=3306;COLUMN_SIZE_S32=1;"
-
-Driver=MySQL ODBC 8.0 ANSI Driver;SERVER=localhost;UID=root;PWD=12345678;DATABASE=auto_test;PORT=3306
-
-Provider=MSDASQL.1;Password=12345678;Persist Security Info=True;User ID=root;Extended Properties="Driver=MySQL ODBC 8.0 ANSI Driver;SERVER=localhost;UID=root;PWD=12345678;DATABASE=auto_test;PORT=3306"
-Provider=MSDASQL.1;Persist Security Info=True;User ID=root;Password=12345678;Extended Properties="Driver=MySQL ODBC 8.0 ANSI Driver;SERVER=localhost;UID=root;PWD=12345678;DATABASE=auto_test;PORT=3306"
