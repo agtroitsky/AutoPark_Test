@@ -55,9 +55,9 @@ var
   i,k: integer;
 begin
   if not dmAutoPark.GetViewLists then exit;
-  sgPathLists.RowCount:=Length(ViewLists)+1;
-  for i:=1 to Length(ViewLists) do begin
-    with sgPathLists do with ViewLists[i-1] do begin
+  sgPathLists.RowCount:=Length(PathLists)+1;
+  for i:=1 to Length(PathLists) do begin
+    with sgPathLists do with PathLists[i-1] do begin
       Cells[0,i]:=IntToStr(iID);
       Cells[1,i]:=sCar;
       Cells[2,i]:=sDriver;
@@ -95,36 +95,27 @@ end;
 procedure TfrmAutoParkMain.btnNewClick(Sender: TObject);
 var
   i: integer;
-  aData, aCar: TDataRec;
+  aData: TPathListRec;
 begin
   aData.iID:=-1;
   if not frmPathList.DoPathList(aData) then exit;
   if not dmAutoPark.DoPathListData(aData) then exit;
-  i:=Length(PathLists);
-  aData.iID:=i+1;
-  SetLength(PathLists,i+1);
-  PathLists[i]:=aData;
-  if aData.dlPath > 0 then begin
-    dmAutoPark.AddPathToCar(aData.iCarID,aData.dlPath)
-  end;
+  if aData.dPath > 0 then dmAutoPark.AddPathToCar(aData.iCarID,aData.dPath);
   GridUpdate;
 end;
 
 procedure TfrmAutoParkMain.sgPathListsDblClick(Sender: TObject);
 var
   i: integer;
-  aData: TDataRec;
+  aData: TPathListRec;
   d: double;
 begin
-  i:=ViewLists[sgPathLists.Selection.Top-1].iID-1;
+  i:=sgPathLists.Selection.Top-1;
   aData:=PathLists[i];
   if not frmPathList.DoPathList(aData) then exit;
   if not dmAutoPark.DoPathListData(aData) then exit;
-  d:=aData.dlPath - PathLists[i].dlPath;
-  if d <> 0 then begin
-    dmAutoPark.AddPathToCar(aData.iCarID,d)
-  end;
-  PathLists[i]:=aData;
+  d:=aData.dPath - PathLists[i].dPath;
+  if d <> 0 then dmAutoPark.AddPathToCar(aData.iCarID,d);
   GridUpdate;
 end;
 
@@ -178,7 +169,7 @@ var
   i,selRow: integer;
   s: string;
 begin
-  if Length(ViewLists) = 0 then exit;
+  if Length(PathLists) = 0 then exit;
   s:=sgPathLists.Cells[ACol,ARow];
   selRow:=sgPathLists.Selection.Top;
   with sgPathLists.Canvas do begin
@@ -187,7 +178,7 @@ begin
     else Brush.Color:=clWhite;
     FillRect(Rect);
     Font.Color:=clBlack;
-    if ARow <> 0 then if ViewLists[aRow-1].bDeleted then Font.Color:=clRed;
+    if ARow <> 0 then if PathLists[aRow-1].bDeleted then Font.Color:=clRed;
     i:=TextWidth(s) - sgPathLists.ColWidths[ACol]+10;
     if i > 0 then begin
       sgPathLists.ColWidths[ACol]:=sgPathLists.ColWidths[ACol]+i;

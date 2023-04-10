@@ -67,7 +67,7 @@ begin
     cbCarModel.ItemIndex:=cbCarModel.Items.IndexOf(GetCarModelName(iCarModelID));
     seYear.Value:=iYear;
     dpTODate.Date:=tLastTO;
-    edPath.Text:=format('%.1f',[dcPath]);
+    edPath.Text:=format('%.1f',[dPath]);
     cbDeleted.Checked:=bDeleted;
   end;
   if ShowModal <> mrOk then exit;
@@ -76,7 +76,7 @@ begin
     sNumber:=edNumber.Text;
     iYear:=seYear.Value;
     tLastTO:=dpTODate.Date;
-    dcPath:=fdPath;
+    dPath:=fdPath;
     bDeleted:=cbDeleted.Checked;
   end;
   result:=true;

@@ -43,9 +43,6 @@ type
     iID: integer;
     bDeleted: boolean;
   case integer of
-    0: (tTimeOut,tTimeIn: TDateTime;
-      iDriverID, iCarID, iDispID: integer;
-      dFuel, dlPath: double);
     1: (tBirthDate: TDate;
       sdrName, sdrSurName, sdrPatronymic: string[lStrMax]);
     2: (sdsName, sdsSurName, sdsPatronymic: string[lStrMax]);
@@ -53,12 +50,13 @@ type
     4: (sNumber: string[lNumMax];
       iCarModelID, iYear: integer;
       tLastTO: TDate;
-      dcPath: double);
+      dPath: double);
   end;
 
-  TViewRec = record
+  TPathListRec = record
     iID: integer;
     bDeleted: boolean;
+    iDriverID, iCarID, iDispID: integer;
     sCar, sDriver, sDispatcher: string;
     dFuel, dPath: double;
     tTimeIn, tTimeOut: TDateTime;
@@ -85,7 +83,7 @@ type
     function GetLists: boolean;
     function GetViewLists: boolean;
     function GetDispatchers: boolean;
-    function DoPathListData(aData: TDataRec): boolean;
+    function DoPathListData(aData: TPathListRec): boolean;
     function DoCarModelData(aData: TDataRec): boolean;
     function DoCarData(aData: TDataRec): boolean;
     function DoDriverData(aData: TDataRec): boolean;
@@ -100,8 +98,8 @@ function GetCarModelName(aID: integer): string;
 
 var
   dmAutoPark: TdmAutoPark;
-  PathLists, Drivers, Dispatchers, CarModels, Cars: array of TDataRec;
-  ViewLists: array of TViewRec;
+  PathLists: array of TPathListRec;
+  Drivers, Dispatchers, CarModels, Cars: array of TDataRec;
   CurViewStyle: TViewStyleRec;
 
 implementation
@@ -218,7 +216,7 @@ try
       iCarModelID:=FieldByName('model_id').AsInteger;
       iYear:=FieldByName('year').AsInteger;
       tLastTO:=FieldByName('last_to').AsDateTime;
-      dCPath:=FieldByName('path').AsFloat;
+      dPath:=FieldByName('path').AsFloat;
       bDeleted:=FieldByName('deleted').AsInteger > 0;
       Next;
     end;
@@ -297,7 +295,7 @@ try
       iCarID:=FieldByName('car_id').AsInteger;
       iDispID:=FieldByName('disp_id').AsInteger;
       dFuel:=FieldByName('fuel').AsFloat;
-      dlPath:=FieldByName('path').AsFloat;
+      dPath:=FieldByName('path').AsFloat;
       bDeleted:=FieldByName('deleted').AsInteger > 0;
       Next;
     end;
@@ -319,6 +317,7 @@ begin
   result:=false;
   s:='SELECT pl.id as lnum, pl.timeout as ltimeout, pl.timein as ltimein,';
   s:=s+' pl.fuel as lfuel, pl.path as lpath, pl.deleted as ldeleted,';
+  s:=s+' pl.driver_id, pl.disp_id, pl.car_id,';
   s:=s+' CONCAT(dr.surname,'' '',dr.name,'' '',dr.patronymic) as ldriver,';
   s:=s+' CONCAT(ds.surname,'' '',ds.name,'' '',ds.patronymic) as ldisp,';
   s:=s+' CONCAT(cr.number,'' '',cm.firm,'' '',cm.model) as lcar,';
@@ -330,17 +329,21 @@ begin
   s:=s+' JOIN carmodels as cm on cm.id = cr.model_id';
   case CurViewStyle.iSelect1 of
     vSelectNumber: s:=s+' WHERE pl.id BETWEEN '+IntToStr(CurViewStyle.iFrom)+' AND '+IntToStr(CurViewStyle.iTo);
-    vSelectTimeOut:;
-    vSelectTimeIn:;
+    vSelectTimeOut: s:=s+' WHERE pl.timeout BETWEEN '''
+          +FormatDateTime('yyyy-mm-dd',Int(CurViewStyle.dFrom))
+          +''' AND '''+FormatDateTime('yyyy-mm-dd',Int(CurViewStyle.dTo))+'''';
+    vSelectTimeIn: s:=s+' WHERE pl.timein BETWEEN '''
+          +FormatDateTime('yyyy-mm-dd',Int(CurViewStyle.dFrom))
+          +''' AND '''+FormatDateTime('yyyy-mm-dd',Int(CurViewStyle.dTo))+'''';
     vSelectCarNumValue: s:=s+' WHERE cr.number = '''+CurViewStyle.sSelect2+'''';
-    vSelectCarNumPart:;
-    vSelectCarModValue:;
-    vSelectCarModPart:;
+    vSelectCarNumPart: s:=s+' WHERE cr.number LIKE %'''+CurViewStyle.sPart+'''%';
+    vSelectCarModValue: s:=s+' WHERE lcar = '''+CurViewStyle.sSelect2+'''';
+    vSelectCarModPart: s:=s+' WHERE lcar LIKE %'''+CurViewStyle.sPart+'''%';
     vSelectCarYear: s:=s+' WHERE cr.year BETWEEN '+IntToStr(CurViewStyle.iFrom)+' AND '+IntToStr(CurViewStyle.iTo);
-    vSelectDriverValue:;
-    vSelectDriverPart:;
-    vSelectDispValue:;
-    vSelectDispPart:;
+    vSelectDriverValue: s:=s+' WHERE ldriver = '''+CurViewStyle.sSelect2+'''';
+    vSelectDriverPart: s:=s+' WHERE ldriver LIKE %'''+CurViewStyle.sPart+'''%';
+    vSelectDispValue: s:=s+' WHERE ldisp = '''+CurViewStyle.sSelect2+'''';
+    vSelectDispPart: s:=s+' WHERE ldisp LIKE %'''+CurViewStyle.sPart+'''%';
     vSelectPath: s:=s+' WHERE pl.path BETWEEN '+IntToStr(CurViewStyle.iFrom)+' AND '+IntToStr(CurViewStyle.iTo);
     vSelectFuel: s:=s+' WHERE pl.fuel BETWEEN '+IntToStr(CurViewStyle.iFrom)+' AND '+IntToStr(CurViewStyle.iTo);
   end;
@@ -390,18 +393,21 @@ begin
     SQL.Add(s);
 try
     Active:=true;
-    SetLength(ViewLists,RecordCount);
+    SetLength(PathLists,RecordCount);
     First;
-    for i:=0 to High(ViewLists) do begin
-      ViewLists[i].iID:=FieldByName('lnum').AsInteger;
-      ViewLists[i].tTimeOut:=FieldByName('ltimeout').AsDateTime;
-      ViewLists[i].tTimeIn:=FieldByName('ltimein').AsDateTime;
-      ViewLists[i].sDriver:=FieldByName('ldriver').AsString;
-      ViewLists[i].sCar:=FieldByName('lcar').AsString;
-      ViewLists[i].sDispatcher:=FieldByName('ldisp').AsString;
-      ViewLists[i].dFuel:=FieldByName('lfuel').AsFloat;
-      ViewLists[i].dPath:=FieldByName('lpath').AsFloat;
-      ViewLists[i].bDeleted:=FieldByName('ldeleted').AsInteger > 0;
+    for i:=0 to High(PathLists) do with PathLists[i] do begin
+      iID:=FieldByName('lnum').AsInteger;
+      tTimeOut:=FieldByName('ltimeout').AsDateTime;
+      tTimeIn:=FieldByName('ltimein').AsDateTime;
+      iDriverID:=FieldByName('driver_id').AsInteger;
+      sDriver:=FieldByName('ldriver').AsString;
+      iCarID:=FieldByName('car_id').AsInteger;
+      sCar:=FieldByName('lcar').AsString;
+      iDispID:=FieldByName('disp_id').AsInteger;
+      sDispatcher:=FieldByName('ldisp').AsString;
+      dFuel:=FieldByName('lfuel').AsFloat;
+      dPath:=FieldByName('lpath').AsFloat;
+      bDeleted:=FieldByName('ldeleted').AsInteger > 0;
       Next;
     end;
     Active:=false;
@@ -683,7 +689,7 @@ begin
     MessageDlg('При коррекции пробега автомобиль не найден'#13'Обратитесь к разработчику',mtError,[mbOk],0);
     exit;
   end;
-  Cars[k].dcPath:=Cars[k].dcPath+aPath;
+  Cars[k].dPath:=Cars[k].dPath+aPath;
   if not DoCarData(Cars[k]) then exit;
   result:=true;
 end;
@@ -701,7 +707,7 @@ begin
     s:=s+IntToStr(aData.iCarModelID)+',';
     s:=s+IntToStr(aData.iYear)+',';
     s:=s+''''+FormatDateTime('yyyy-mm-dd',aData.tLastTO)+''',';
-    s:=s+''''+DblToStr(aData.dcPath)+''',';
+    s:=s+''''+DblToStr(aData.dPath)+''',';
     s:=s+'0);';
   end
   else begin
@@ -736,9 +742,9 @@ begin
       s:=s+' last_to='''+FormatDateTime('yyyy-mm-dd',aData.tLastTO)+'''';
       bol:=true;
     end;
-    if aData.dcPath <> Cars[k].dcPath then begin
+    if aData.dPath <> Cars[k].dPath then begin
       if bol then s:=s+',';
-      s:=s+' path='''+DblToStr(aData.dcPath)+'''';
+      s:=s+' path='''+DblToStr(aData.dPath)+'''';
       bol:=true;
     end;
     if aData.bDeleted <> Cars[k].bDeleted then begin
@@ -767,7 +773,7 @@ end;
   end;
 end;
 
-function TdmAutoPark.DoPathListData(aData: TDataRec): boolean;
+function TdmAutoPark.DoPathListData(aData: TPathListRec): boolean;
 var
   i,k: integer;
   s: string;
@@ -782,7 +788,7 @@ begin
     s:=s+IntToStr(aData.iCarID)+',';
     s:=s+IntToStr(aData.iDispID)+',';
     s:=s+''''+DblToStr(aData.dFuel)+''',';
-    s:=s+''''+DblToStr(aData.dlPath)+''',';
+    s:=s+''''+DblToStr(aData.dPath)+''',';
     s:=s+'0);';
   end
   else begin
@@ -827,9 +833,9 @@ begin
       s:=s+' fuel='''+DblToStr(aData.dFuel)+'''';
       bol:=true;
     end;
-    if aData.dlPath <> PathLists[k].dlPath then begin
+    if aData.dPath <> PathLists[k].dPath then begin
       if bol then s:=s+',';
-      s:=s+' path='''+DblToStr(aData.dlPath)+'''';
+      s:=s+' path='''+DblToStr(aData.dPath)+'''';
       bol:=true;
     end;
     if aData.bDeleted <> Cars[k].bDeleted then begin

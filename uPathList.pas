@@ -35,7 +35,7 @@ type
     fdFuel, fdPath: double;
   public
     { Public declarations }
-    function DoPathList(var aData: TDataRec): boolean;
+    function DoPathList(var aData: TPathListRec): boolean;
   end;
 
 var
@@ -138,7 +138,7 @@ begin
   dpDateIn.Visible:=cbIn.Checked;
 end;
 
-function TfrmPathList.DoPathList(var aData: TDataRec): boolean;
+function TfrmPathList.DoPathList(var aData: TPathListRec): boolean;
 var
   i: integer;
 begin
@@ -199,7 +199,7 @@ begin
       tpTimeOut.Time:=Frac(tTimeOut);
     end;
     edFuel.Text:=format('%.1f',[dFuel]);
-    edPath.Text:=format('%.1f',[dlPath]);
+    edPath.Text:=format('%.1f',[dPath]);
     cbDeleted.Checked:=bDeleted;
   end;
 
@@ -213,7 +213,7 @@ begin
     if cbOut.Checked then tTimeOut:=Int(dpDateOut.Date)+Frac(tpTimeOut.Time)
     else tTimeOut:=0;
     dFuel:=fdFuel;
-    dlPath:=fdPath;
+    dPath:=fdPath;
     bDeleted:=cbDeleted.Checked;
   end;
   result:=true;

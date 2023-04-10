@@ -116,7 +116,7 @@ begin
     vSelectPath: begin
       SetToNumber;
       for i:=0 to High(PathLists) do with PathLists[i] do begin
-        k:=Round(Int(dlPath));
+        k:=Round(Int(dPath));
         if k < n1 then n1:=k;
         Inc(k);
         if k > n2 then n2:=k;
