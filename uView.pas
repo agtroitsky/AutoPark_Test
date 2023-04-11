@@ -1,3 +1,14 @@
+(*******************************************************************************
+  * @project AutoPark
+  * @file    uView.pas
+  * @date    11/04/2023
+  * @brief   Форма редактирования параметров сортировки и тобора путевых листов на главной форме
+  ******************************************************************************
+  *
+  * COPYRIGHT(c) 2023 А.Г.Троицкий
+  *
+*******************************************************************************)
+
 unit uView;
 
 interface
@@ -28,6 +39,8 @@ type
     procedure cbSort1Change(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure cbSelect1Change(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   public
@@ -255,6 +268,26 @@ begin
     bShowDeleted:=cbShowDeleted.Checked;
   end;
   result:=true;
+end;
+
+procedure TfrmView.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose:=false;
+  if dpFrom.Visible then if dpFrom.Date < dpTo.Date then begin
+    MessageDlg('Начальная дата меньше конечной',mtError,[mbOk],0);
+    dpFrom.SetFocus;
+    exit;
+  end
+  else if seFrom.Visible then if seFrom.Value < seTo.Value then begin
+    MessageDlg('Начальное значение меньше конечного',mtError,[mbOk],0);
+    dpFrom.SetFocus;
+    exit;
+  end;
+end;
+
+procedure TfrmView.FormShow(Sender: TObject);
+begin
+  cbSort1.SetFocus;
 end;
 
 procedure TfrmView.FormKeyDown(Sender: TObject; var Key: Word;

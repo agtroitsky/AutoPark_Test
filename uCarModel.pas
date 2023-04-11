@@ -1,3 +1,14 @@
+(*******************************************************************************
+  * @project AutoPark
+  * @file    uCarModel.pas
+  * @date    11/04/2023
+  * @brief   Форма редактирования справочника моделей автомобилей
+  ******************************************************************************
+  *
+  * COPYRIGHT(c) 2023 А.Г.Троицкий
+  *
+*******************************************************************************)
+
 unit uCarModel;
 
 interface
@@ -62,18 +73,6 @@ begin
   CanClose:=true;
 end;
 
-procedure TfrmCarModel.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-  if Key = VK_ESCAPE then ModalResult:=mrCancel;
-  if Key = VK_RETURN then ModalResult:=mrOk;
-end;
-
-procedure TfrmCarModel.FormShow(Sender: TObject);
-begin
-  edFirm.SetFocus;
-end;
-
 function TfrmCarModel.DoCarModel(var aData: TDataRec): boolean;
 var
   i: integer;
@@ -98,6 +97,18 @@ begin
     bDeleted:=cbDeleted.Checked;
   end;
   result:=true;
+end;
+
+procedure TfrmCarModel.FormShow(Sender: TObject);
+begin
+  edFirm.SetFocus;
+end;
+
+procedure TfrmCarModel.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then ModalResult:=mrCancel;
+  if Key = VK_RETURN then ModalResult:=mrOk;
 end;
 
 end.

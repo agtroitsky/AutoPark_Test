@@ -1,3 +1,14 @@
+(*******************************************************************************
+  * @project AutoPark
+  * @file    uPathList.pas
+  * @date    11/04/2023
+  * @brief   Форма редактирования путевого листа
+  ******************************************************************************
+  *
+  * COPYRIGHT(c) 2023 А.Г.Троицкий
+  *
+*******************************************************************************)
+
 unit uPathList;
 
 interface
@@ -30,6 +41,8 @@ type
     procedure cbOutClick(Sender: TObject);
     procedure cbInClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormShow(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     fdFuel, fdPath: double;
@@ -217,6 +230,18 @@ begin
     bDeleted:=cbDeleted.Checked;
   end;
   result:=true;
+end;
+
+procedure TfrmPathList.FormShow(Sender: TObject);
+begin
+  cbCar.SetFocus;
+end;
+
+procedure TfrmPathList.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then ModalResult:=mrCancel;
+  if Key = VK_RETURN then ModalResult:=mrOk;
 end;
 
 end.

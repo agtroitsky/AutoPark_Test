@@ -1,3 +1,14 @@
+(*******************************************************************************
+  * @project AutoPark
+  * @file    uCommon.pas
+  * @date    11/04/2023
+  * @brief   Модуль общих переменных и процедур
+  ******************************************************************************
+  *
+  * COPYRIGHT(c) 2023 А.Г.Троицкий
+  *
+*******************************************************************************)
+
 unit uCommon;
 
 interface
@@ -7,7 +18,7 @@ Var
 
 function floatBoolValidation(s: string; var d: double): boolean;
 function DblToStr(d: double): string;
-function GetMyVer: string;
+function GetMyFileVersion: string;
 
 implementation
 
@@ -38,6 +49,7 @@ begin
   end;
 end;
 
+// Строковое представление чмсла с "точкой" независимо от настроек системы для MySQL
 function DblToStr(d: double): string;
 begin
   result:=IntToStr(Round(Int(d)));
@@ -45,7 +57,7 @@ begin
   result:=result+IntToStr(Round(Frac(d)*10));
 end;
 
-function GetMyVer: string;
+function GetMyFileVersion: string;
 var
 	ii: integer;
 	hr: hrsrc;
@@ -61,6 +73,5 @@ end;
 begin
   ExePath:=ExtractFilePath(Application.ExeName);
 	IniName:=ExtractFileName(Application.ExeName);
-  Delete(IniName, Pos('.',IniName),10);
-  IniName:=IniName+'.ini';
+  IniName:=ChangeFileExt(IniName,'.ini');
 end.

@@ -3,7 +3,7 @@ object frmView: TfrmView
   Top = 0
   BorderStyle = bsDialog
   Caption = #1042#1080#1076' '#1090#1072#1073#1083#1080#1094#1099
-  ClientHeight = 282
+  ClientHeight = 273
   ClientWidth = 262
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,10 +14,12 @@ object frmView: TfrmView
   KeyPreview = True
   OldCreateOrder = False
   Position = poMainFormCenter
+  OnCloseQuery = FormCloseQuery
   OnKeyDown = FormKeyDown
+  OnShow = FormShow
   DesignSize = (
     262
-    282)
+    273)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
@@ -166,7 +168,7 @@ object frmView: TfrmView
   end
   object btnOk: TButton
     Left = 28
-    Top = 239
+    Top = 230
     Width = 86
     Height = 33
     Anchors = [akLeft, akBottom]
@@ -179,11 +181,11 @@ object frmView: TfrmView
     ModalResult = 1
     ParentFont = False
     TabOrder = 2
-    ExplicitTop = 202
+    ExplicitTop = 239
   end
   object btnCancel: TButton
     Left = 158
-    Top = 243
+    Top = 234
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -196,6 +198,6 @@ object frmView: TfrmView
     ModalResult = 2
     ParentFont = False
     TabOrder = 3
-    ExplicitTop = 206
+    ExplicitTop = 243
   end
 end

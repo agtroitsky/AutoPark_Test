@@ -3,7 +3,7 @@ object frmList: TfrmList
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'frmList'
-  ClientHeight = 202
+  ClientHeight = 265
   ClientWidth = 266
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -37,7 +37,7 @@ object frmList: TfrmList
     Left = 0
     Top = 41
     Width = 266
-    Height = 161
+    Height = 224
     Align = alClient
     ColCount = 1
     DefaultDrawing = False
@@ -47,6 +47,7 @@ object frmList: TfrmList
     TabOrder = 1
     OnDblClick = sgListDblClick
     OnDrawCell = sgListDrawCell
+    ExplicitHeight = 161
     ColWidths = (
       253)
   end

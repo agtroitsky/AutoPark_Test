@@ -1,3 +1,14 @@
+(*******************************************************************************
+  * @project AutoPark
+  * @file    uExport.pas
+  * @date    11/04/2023
+  * @brief   Модуль экспорта путевых листов в шаблоны Word и Excel
+  ******************************************************************************
+  *
+  * COPYRIGHT(c) 2023 А.Г.Троицкий
+  *
+*******************************************************************************)
+
 unit uExport;
 
 interface
@@ -74,6 +85,7 @@ end;
     if (sfTimeOut <> '') and (tTimeOut > 0) then WorkSheet.Range[sfTimeOut]:=FormatDateTime('yyyy-mm-dd hh:nn',tTimeOut);
     if (sfFuel <> '') and (dFuel > 0) then WorkSheet.Range[sfFuel]:=format('%.1f',[dFuel]);
     if (sfPath <> '') and (dPath > 0)  then WorkSheet.Range[sfPath]:=format('%.1f',[dPath]);
+// Вставка в имя выходного файла текущей даты вместо %D и номера путевого листа вместо %N
     s:=sFileOut;
     repeat
       i:=Pos('%',s);
@@ -166,6 +178,7 @@ end;
     if (sfPath <> '') and (dPath > 0)  then if WordDoc.Bookmarks.Exists(sfPath) then
       WordDoc.Bookmarks.Item(sfPath).Range.InsertAfter(Format('%.1f',[dPath]));
 
+// Вставка в имя выходного файла текущей даты вместо %D и номера путевого листа вместо %N
     s:=sFileOut;
     repeat
       i:=Pos('%',s);

@@ -1,3 +1,14 @@
+(*******************************************************************************
+  * @project AutoPark
+  * @file    uList.pas
+  * @date    11/04/2023
+  * @brief   Форма отображения справочников
+  ******************************************************************************
+  *
+  * COPYRIGHT(c) 2023 А.Г.Троицкий
+  *
+*******************************************************************************)
+
 unit uList;
 
 interface
@@ -123,6 +134,7 @@ begin
   ShowModal;
 end;
 
+// Ограничил минимальную ширину формы, чтобы не пропадала кнопка
 procedure TfrmList.FormResize(Sender: TObject);
 const minWidth = 200;
 begin
@@ -168,28 +180,31 @@ begin
   end;
 end;
 
+// Своя отрисовка таблицы для выделения красным цветом удаленных элементов
 procedure TfrmList.sgListDrawCell(Sender: TObject; ACol, ARow: Integer;
   Rect: TRect; State: TGridDrawState);
 var
   i,selRow: integer;
   s: string;
-  bol: boolean;
+  bIsDeleted: boolean;
 begin
   if sgList.RowCount = 0 then exit;
   s:=sgList.Cells[ACol,ARow];
   selRow:=sgList.Selection.Top;
   case fiStyle of
-    stDriver: if Length(Drivers) > 0 then bol:=Drivers[ARow].bDeleted else exit;
-    stDispatcher: if Length(Dispatchers) > 0 then bol:=Dispatchers[ARow].bDeleted else exit;
-    stCarModel: if Length(CarModels) > 0 then bol:=CarModels[ARow].bDeleted else exit;
-    stCar: if Length(Cars) > 0 then bol:=Cars[ARow].bDeleted else exit;
+    stDriver: if Length(Drivers) > 0 then bIsDeleted:=Drivers[ARow].bDeleted else exit;
+    stDispatcher: if Length(Dispatchers) > 0 then bIsDeleted:=Dispatchers[ARow].bDeleted else exit;
+    stCarModel: if Length(CarModels) > 0 then bIsDeleted:=CarModels[ARow].bDeleted else exit;
+    stCar: if Length(Cars) > 0 then bIsDeleted:=Cars[ARow].bDeleted else exit;
     else exit;
   end;
   with sgList.Canvas do begin
+// Выделенную строку заливаем синим
     if ARow = selRow then Brush.Color:=clSkyBlue
     else Brush.Color:=clWhite;
     FillRect(Rect);
-    if bol then Font.Color:=clRed else Font.Color:=clBlack;
+// Удаленные элементы печатаем красным
+    if bIsDeleted then Font.Color:=clRed else Font.Color:=clBlack;
     i:=TextWidth(s) - sgList.ColWidths[0]+10;
     if i > 0 then begin
       sgList.ColWidths[0]:=sgList.ColWidths[0]+i;

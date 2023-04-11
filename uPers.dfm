@@ -4,7 +4,7 @@ object frmPers: TfrmPers
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = #1055#1077#1088#1089#1086#1085#1072#1083
-  ClientHeight = 248
+  ClientHeight = 246
   ClientWidth = 199
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,6 +18,9 @@ object frmPers: TfrmPers
   OnCloseQuery = FormCloseQuery
   OnKeyDown = FormKeyDown
   OnShow = FormShow
+  DesignSize = (
+    199
+    246)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -29,7 +32,7 @@ object frmPers: TfrmPers
   end
   object Label4: TLabel
     Left = 8
-    Top = 148
+    Top = 152
     Width = 80
     Height = 13
     Caption = #1044#1072#1090#1072' '#1088#1086#1078#1076#1077#1085#1080#1103
@@ -50,7 +53,7 @@ object frmPers: TfrmPers
   end
   object dpBirthDate: TDateTimePicker
     Left = 110
-    Top = 146
+    Top = 150
     Width = 81
     Height = 21
     Date = 45022.548412060180000000
@@ -59,7 +62,7 @@ object frmPers: TfrmPers
   end
   object cbDeleted: TCheckBox
     Left = 59
-    Top = 173
+    Top = 176
     Width = 77
     Height = 20
     Caption = #1059#1076#1072#1083#1077#1085
@@ -75,9 +78,10 @@ object frmPers: TfrmPers
   end
   object btnOk: TButton
     Left = 8
-    Top = 207
+    Top = 205
     Width = 86
     Height = 33
+    Anchors = [akLeft, akBottom]
     Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -87,12 +91,14 @@ object frmPers: TfrmPers
     ModalResult = 1
     ParentFont = False
     TabOrder = 5
+    ExplicitTop = 207
   end
   object btnCancel: TButton
     Left = 116
-    Top = 211
+    Top = 209
     Width = 75
     Height = 25
+    Anchors = [akLeft, akBottom]
     Caption = #1054#1090#1084#1077#1085#1080#1090#1100
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
@@ -102,6 +108,7 @@ object frmPers: TfrmPers
     ModalResult = 2
     ParentFont = False
     TabOrder = 6
+    ExplicitTop = 211
   end
   object edPatronymic: TEdit
     Left = 9

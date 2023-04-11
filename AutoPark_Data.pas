@@ -1,3 +1,14 @@
+(*******************************************************************************
+  * @project AutoPark
+  * @file    AutoPark_Data.pas
+  * @date    11/04/2023
+  * @brief   Модуль данных проекта
+  ******************************************************************************
+  *
+  * COPYRIGHT(c) 2023 А.Г.Троицкий
+  *
+*******************************************************************************)
+
 unit AutoPark_Data;
 
 interface
@@ -6,9 +17,11 @@ uses
   System.SysUtils, System.Classes, Data.DB, Data.Win.ADODB;
 
 const
+// Максимальные длины строк в соответствии с базой
   lNumMax = 10;
-  lStrMax = 40;
+  lStrMax = 45;
 
+// Режимы сортировки путевых листов
   vSortNumber = 0;
   vSortCar    = 1;
   vSortDriver = 2;
@@ -23,6 +36,7 @@ const
   vSortUp2  = 2;
   vSortDwn2 = 3;
 
+// Режимы отбора путевых листов
   vSelectNumber      = 1;
   vSelectTimeOut     = 2;
   vSelectTimeIn      = 3;
@@ -39,20 +53,19 @@ const
   vSelectFuel        = 14;
 
 type
+// Объединенная вариантная структура параметров единая для всех справочников
   TDataRec = record
     iID: integer;
     bDeleted: boolean;
   case integer of
-    1: (tBirthDate: TDate;
-      sdrName, sdrSurName, sdrPatronymic: string[lStrMax]);
-    2: (sdsName, sdsSurName, sdsPatronymic: string[lStrMax]);
-    3: (sFirm, sModel: string[lStrMax]);
-    4: (sNumber: string[lNumMax];
-      iCarModelID, iYear: integer;
-      tLastTO: TDate;
-      dPath: double);
+    1: (tBirthDate: TDate; sdrName, sdrSurName, sdrPatronymic: string[lStrMax]); // Водители
+    2: (sdsName, sdsSurName, sdsPatronymic: string[lStrMax]); // Диспетчеры
+    3: (sFirm, sModel: string[lStrMax]); // Модели автомобилей
+    4: (sNumber: string[lNumMax]; iCarModelID, iYear: integer;
+         tLastTO: TDate; dPath: double); // Автомобили
   end;
 
+// Структура параметров путевых листов
   TPathListRec = record
     iID: integer;
     bDeleted: boolean;
@@ -62,6 +75,7 @@ type
     tTimeIn, tTimeOut: TDateTime;
   end;
 
+// Структура параметров сортировки и отбора путевых листов
   TViewStyleRec = record
     iSort1, iSort2: integer;
     iSelect1, iFrom, iTo: integer;
@@ -645,25 +659,6 @@ end;
   end;
 end;
 
-function TdmAutoPark.AddPathToCar(aCarID: integer; aPath: double): boolean;
-var
-  i,k: integer;
-begin
-  result:=false;
-  k:=-1;
-  for i:=0 to High(Cars) do if aCarID = Cars[i].iID then begin
-    k:=i;
-    break;
-  end;
-  if k < 0 then begin
-    MessageDlg('При коррекции пробега автомобиль не найден'#13'Обратитесь к разработчику',mtError,[mbOk],0);
-    exit;
-  end;
-  Cars[k].dPath:=Cars[k].dPath+aPath;
-  if not DoCarData(Cars[k]) then exit;
-  result:=true;
-end;
-
 function TdmAutoPark.DoCarData(aData: TDataRec): boolean;
 var
   i,k: integer;
@@ -834,4 +829,24 @@ end;
   end;
 end;
 
+function TdmAutoPark.AddPathToCar(aCarID: integer; aPath: double): boolean;
+var
+  i,k: integer;
+begin
+  result:=false;
+  k:=-1;
+  for i:=0 to High(Cars) do if aCarID = Cars[i].iID then begin
+    k:=i;
+    break;
+  end;
+  if k < 0 then begin
+    MessageDlg('При коррекции пробега автомобиль не найден'#13'Обратитесь к разработчику',mtError,[mbOk],0);
+    exit;
+  end;
+  Cars[k].dPath:=Cars[k].dPath+aPath;
+  if not DoCarData(Cars[k]) then exit;
+  result:=true;
+end;
+
 end.
+

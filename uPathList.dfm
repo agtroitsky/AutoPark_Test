@@ -5,16 +5,19 @@ object frmPathList: TfrmPathList
   BorderStyle = bsDialog
   Caption = #1055#1091#1090#1077#1074#1086#1081' '#1083#1080#1089#1090
   ClientHeight = 361
-  ClientWidth = 286
+  ClientWidth = 272
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poMainFormCenter
   OnCloseQuery = FormCloseQuery
+  OnKeyDown = FormKeyDown
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Label3: TLabel
@@ -59,7 +62,7 @@ object frmPathList: TfrmPathList
     Height = 21
     Date = 45022.548412060180000000
     Time = 45022.548412060180000000
-    TabOrder = 0
+    TabOrder = 4
     Visible = False
   end
   object tpTimeOut: TDateTimePicker
@@ -70,7 +73,7 @@ object frmPathList: TfrmPathList
     Date = 45022.548596226850000000
     Time = 45022.548596226850000000
     Kind = dtkTime
-    TabOrder = 1
+    TabOrder = 5
     Visible = False
   end
   object dpDateIn: TDateTimePicker
@@ -80,7 +83,7 @@ object frmPathList: TfrmPathList
     Height = 21
     Date = 45022.548412060180000000
     Time = 45022.548412060180000000
-    TabOrder = 2
+    TabOrder = 7
     Visible = False
   end
   object tpTimeIn: TDateTimePicker
@@ -91,7 +94,7 @@ object frmPathList: TfrmPathList
     Date = 45022.548596226850000000
     Time = 45022.548596226850000000
     Kind = dtkTime
-    TabOrder = 3
+    TabOrder = 8
     Visible = False
   end
   object cbCar: TComboBox
@@ -101,7 +104,7 @@ object frmPathList: TfrmPathList
     Height = 21
     Style = csDropDownList
     Sorted = True
-    TabOrder = 4
+    TabOrder = 0
   end
   object cbDriver: TComboBox
     Left = 16
@@ -110,7 +113,7 @@ object frmPathList: TfrmPathList
     Height = 21
     Style = csDropDownList
     Sorted = True
-    TabOrder = 5
+    TabOrder = 1
   end
   object cbDisp: TComboBox
     Left = 16
@@ -119,7 +122,7 @@ object frmPathList: TfrmPathList
     Height = 21
     Style = csDropDownList
     Sorted = True
-    TabOrder = 6
+    TabOrder = 2
   end
   object cbOut: TCheckBox
     Left = 16
@@ -127,7 +130,7 @@ object frmPathList: TfrmPathList
     Width = 65
     Height = 17
     Caption = #1042#1099#1077#1093#1072#1083
-    TabOrder = 7
+    TabOrder = 3
     OnClick = cbOutClick
   end
   object cbIn: TCheckBox
@@ -136,12 +139,12 @@ object frmPathList: TfrmPathList
     Width = 65
     Height = 17
     Caption = #1042#1077#1088#1085#1091#1083#1089#1103
-    TabOrder = 8
+    TabOrder = 6
     OnClick = cbInClick
   end
   object cbDeleted: TCheckBox
     Left = 91
-    Top = 265
+    Top = 271
     Width = 77
     Height = 20
     Caption = #1059#1076#1072#1083#1077#1085
@@ -153,24 +156,24 @@ object frmPathList: TfrmPathList
     Font.Style = []
     ParentColor = False
     ParentFont = False
-    TabOrder = 9
+    TabOrder = 11
   end
   object edFuel: TEdit
     Left = 24
     Top = 238
     Width = 94
     Height = 21
-    TabOrder = 10
+    TabOrder = 9
   end
   object edPath: TEdit
     Left = 152
     Top = 238
     Width = 94
     Height = 21
-    TabOrder = 11
+    TabOrder = 10
   end
   object btnOk: TButton
-    Left = 32
+    Left = 34
     Top = 304
     Width = 86
     Height = 33
@@ -185,7 +188,7 @@ object frmPathList: TfrmPathList
     TabOrder = 12
   end
   object btnCancel: TButton
-    Left = 160
+    Left = 162
     Top = 308
     Width = 75
     Height = 25

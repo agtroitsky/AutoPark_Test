@@ -1,3 +1,14 @@
+(*******************************************************************************
+  * @project AutoPark
+  * @file    uPers.pas
+  * @date    11/04/2023
+  * @brief   Форма редактирования справочника персонала (водителей и диспетчеров)
+  ******************************************************************************
+  *
+  * COPYRIGHT(c) 2023 А.Г.Троицкий
+  *
+*******************************************************************************)
+
 unit uPers;
 
 interface
@@ -168,16 +179,16 @@ begin
   CanClose:=true;
 end;
 
+procedure TfrmPers.FormShow(Sender: TObject);
+begin
+  edSurName.SetFocus;
+end;
+
 procedure TfrmPers.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then ModalResult:=mrCancel;
   if Key = VK_RETURN then ModalResult:=mrOk;
-end;
-
-procedure TfrmPers.FormShow(Sender: TObject);
-begin
-  edSurName.SetFocus;
 end;
 
 end.

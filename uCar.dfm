@@ -4,7 +4,7 @@ object frmCar: TfrmCar
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = #1040#1074#1090#1086#1084#1086#1073#1080#1083#1100
-  ClientHeight = 270
+  ClientHeight = 267
   ClientWidth = 196
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,6 +18,9 @@ object frmCar: TfrmCar
   OnCloseQuery = FormCloseQuery
   OnKeyDown = FormKeyDown
   OnShow = FormShow
+  DesignSize = (
+    196
+    267)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -98,9 +101,10 @@ object frmCar: TfrmCar
   end
   object btnOk: TButton
     Left = 11
-    Top = 226
+    Top = 223
     Width = 86
     Height = 33
+    Anchors = [akLeft, akBottom]
     Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -113,9 +117,10 @@ object frmCar: TfrmCar
   end
   object btnCancel: TButton
     Left = 109
-    Top = 231
+    Top = 228
     Width = 75
     Height = 25
+    Anchors = [akLeft, akBottom]
     Caption = #1054#1090#1084#1077#1085#1080#1090#1100
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack

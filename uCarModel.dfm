@@ -4,7 +4,7 @@ object frmCarModel: TfrmCarModel
   BorderStyle = bsDialog
   Caption = #1052#1086#1076#1077#1083#1080' '#1072#1074#1090#1086#1084#1086#1073#1080#1083#1077#1081
   ClientHeight = 140
-  ClientWidth = 208
+  ClientWidth = 202
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,7 +18,7 @@ object frmCarModel: TfrmCarModel
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
-    208
+    202
     140)
   PixelsPerInch = 96
   TextHeight = 13
@@ -66,7 +66,7 @@ object frmCarModel: TfrmCarModel
     TabOrder = 2
   end
   object btnOk: TButton
-    Left = 8
+    Left = 13
     Top = 99
     Width = 86
     Height = 33
@@ -82,7 +82,7 @@ object frmCarModel: TfrmCarModel
     TabOrder = 3
   end
   object btnCancel: TButton
-    Left = 109
+    Left = 114
     Top = 103
     Width = 75
     Height = 25

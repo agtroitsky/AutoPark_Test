@@ -1,3 +1,14 @@
+(*******************************************************************************
+  * @project AutoPark
+  * @file    uCar.pas
+  * @date    11/04/2023
+  * @brief   Форма редактирования справочника автомобилей
+  ******************************************************************************
+  *
+  * COPYRIGHT(c) 2023 А.Г.Троицкий
+  *
+*******************************************************************************)
+
 unit uCar;
 
 interface
@@ -124,16 +135,16 @@ begin
   CanClose:=true;
 end;
 
+procedure TfrmCar.FormShow(Sender: TObject);
+begin
+  edNumber.SetFocus;
+end;
+
 procedure TfrmCar.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then ModalResult:=mrCancel;
   if Key = VK_RETURN then ModalResult:=mrOk;
-end;
-
-procedure TfrmCar.FormShow(Sender: TObject);
-begin
-  edNumber.SetFocus;
 end;
 
 end.
